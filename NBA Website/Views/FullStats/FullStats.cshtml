@@ -1,0 +1,905 @@
+﻿@model NBA_Website.Models.FullStatsViewModel
+
+@{
+    ViewData["Title"] = "Полная статистика игроков NBA";
+
+    string GetSortDirection(string column)
+    {
+        if (Model.SortBy == column)
+            return "_desc";
+        return "";
+    }
+
+    string GetNewSortBy(string column)
+    {
+        if (Model.SortBy == column)
+            return column + "_desc";
+        return column;
+    }
+}
+
+<style>
+    .stats-container {
+        max-width: 1600px;
+        margin: 0 auto;
+        padding: 30px 20px;
+    }
+
+    .page-header {
+        background: linear-gradient(135deg, #1a1a1a 0%, #2c2c2c 100%);
+        border-radius: 20px;
+        padding: 40px;
+        margin-bottom: 30px;
+        color: white;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 8px;
+            background: linear-gradient(90deg, #ff6b35 0%, #ff8c5a 100%);
+        }
+
+    .page-title {
+        font-size: 2.5em;
+        font-weight: 800;
+        margin-bottom: 10px;
+        letter-spacing: -0.02em;
+    }
+
+    .last-updated {
+        margin-top: 15px;
+        font-size: 0.9em;
+        color: #ccc;
+    }
+
+    .stats-type-panel {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 30px;
+        justify-content: center;
+    }
+
+    .stats-type-btn {
+        padding: 12px 30px;
+        border-radius: 30px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 1.1em;
+        transition: all 0.3s ease;
+        background: white;
+        color: #333;
+        border: 2px solid #ff6b35;
+    }
+
+        .stats-type-btn:hover {
+            background: #ff6b35;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255,107,53,0.3);
+        }
+
+        .stats-type-btn.active {
+            background: #ff6b35;
+            color: white;
+        }
+
+    .table-container {
+        background: white;
+        border-radius: 20px;
+        overflow-x: auto;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        border: 1px solid #e0e0e0;
+        margin-bottom: 30px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.95em;
+    }
+
+    th {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        padding: 15px 10px;
+        font-weight: 700;
+        color: #333;
+        border-bottom: 2px solid #ff6b35;
+        white-space: nowrap;
+        text-align: center;
+        transition: all 0.2s ease;
+        user-select: none;
+    }
+
+        th.sortable {
+            cursor: pointer;
+        }
+
+            th.sortable:hover {
+                background: #e9ecef;
+                color: #ff6b35;
+            }
+
+        th.active-sort {
+            background: #ff6b35;
+            color: white;
+            border-bottom-color: white;
+        }
+
+            th.active-sort i {
+                color: white;
+            }
+
+        th i {
+            margin-left: 5px;
+            font-size: 0.8em;
+            color: #ff6b35;
+        }
+
+    td {
+        padding: 12px 10px;
+        border-bottom: 1px solid #f0f0f0;
+        color: #444;
+        text-align: center;
+        white-space: nowrap;
+        font-size: 1em;
+        transition: all 0.2s ease;
+    }
+
+    tr:last-child td {
+        border-bottom: none;
+    }
+
+    tr:hover {
+        background: #fff5f0;
+    }
+
+    td.sort-column {
+        background-color: rgba(255, 107, 53, 0.1);
+        font-weight: 700;
+        color: #ff6b35;
+        border-left: 1px solid #ff6b35;
+        border-right: 1px solid #ff6b35;
+    }
+
+        td.sort-column:first-child {
+            border-left: none;
+        }
+
+        td.sort-column:last-child {
+            border-right: none;
+        }
+
+    .player-cell {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-align: left;
+        min-width: 200px;
+    }
+
+    .player-image {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        object-fit: cover;
+        transition: transform 0.2s ease;
+    }
+
+    .player-name-link {
+        text-decoration: none;
+        color: inherit;
+        font-weight: 600;
+        transition: color 0.2s ease;
+    }
+
+        .player-name-link:hover {
+            color: #ff6b35;
+            text-decoration: underline;
+        }
+
+    .team-badge {
+        background: #f0f0f0;
+        padding: 3px 8px;
+        border-radius: 15px;
+        font-size: 0.9em;
+        font-weight: 600;
+        color: #666;
+        white-space: nowrap;
+        transition: all 0.2s ease;
+    }
+
+    .team-badge-link {
+        text-decoration: none;
+        display: inline-block;
+        transition: transform 0.2s ease;
+    }
+
+        .team-badge-link:hover {
+            transform: scale(1.05);
+        }
+
+            .team-badge-link:hover .team-badge {
+                background: #ff6b35;
+                color: white;
+                box-shadow: 0 2px 8px rgba(255,107,53,0.3);
+            }
+
+    .pagination-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 30px;
+        padding: 20px;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        border: 1px solid #e0e0e0;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .pagination-info {
+        color: #666;
+        font-size: 0.95em;
+    }
+
+    .pagination {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .page-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 40px;
+        height: 40px;
+        padding: 0 10px;
+        background: #f8f9fa;
+        border: 1px solid #e0e0e0;
+        border-radius: 10px;
+        color: #666;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+        .page-btn:hover {
+            background: #ff6b35;
+            border-color: #ff6b35;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .page-btn.active {
+            background: #ff6b35;
+            border-color: #ff6b35;
+            color: white;
+        }
+
+    .page-dots {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 40px;
+        height: 40px;
+        color: #999;
+    }
+
+    .back-button {
+        display: inline-block;
+        background: #ff6b35;
+        color: white;
+        padding: 12px 30px;
+        border-radius: 30px;
+        text-decoration: none;
+        font-weight: 600;
+        margin-top: 40px;
+        transition: all 0.3s ease;
+    }
+
+        .back-button:hover {
+            background: #ff5420;
+            transform: translateX(-5px);
+            box-shadow: 0 5px 15px rgba(255,107,53,0.3);
+        }
+
+    .text-center {
+        text-align: center;
+    }
+
+    .glossary {
+        background: #f8f9fa;
+        border-radius: 20px;
+        padding: 20px;
+        margin-top: 30px;
+        border: 1px solid #e0e0e0;
+    }
+
+        .glossary h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+    .glossary-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 10px;
+    }
+
+    .glossary-item {
+        font-size: 0.9em;
+        color: #666;
+    }
+
+        .glossary-item strong {
+            color: #ff6b35;
+            margin-right: 5px;
+        }
+
+    .common-stats {
+        display: flex;
+        gap: 30px;
+        margin-bottom: 15px;
+        padding: 10px;
+        background: white;
+        border-radius: 10px;
+        border: 1px solid #e0e0e0;
+    }
+
+    .common-stat-item {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+        .common-stat-item strong {
+            color: #ff6b35;
+        }
+
+    .table-wrapper {
+        position: relative;
+        overflow-x: auto;
+    }
+
+    .sticky-col {
+        position: sticky;
+        left: 0;
+        background: white;
+        z-index: 1;
+    }
+
+    td.sort-column.sticky-col {
+        background-color: rgba(255, 107, 53, 0.1);
+    }
+
+    .sticky-col-header {
+        position: sticky;
+        left: 0;
+        background: #f8f9fa;
+        z-index: 2;
+    }
+
+    .sort-icon {
+        display: inline-block;
+        width: 16px;
+        text-align: center;
+    }
+
+    @@media (max-width: 1400px) {
+        table {
+            font-size: 0.9em;
+        }
+
+        th, td {
+            padding: 10px 8px;
+        }
+
+        .player-cell {
+            min-width: 180px;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .page-title {
+            font-size: 2em;
+        }
+
+        table {
+            font-size: 0.9em;
+        }
+
+        th, td {
+            padding: 8px 6px;
+            font-size: 0.95em;
+        }
+
+        .player-cell {
+            min-width: 160px;
+            gap: 6px;
+        }
+
+        .player-image {
+            width: 26px;
+            height: 26px;
+        }
+
+        .team-badge {
+            padding: 2px 6px;
+            font-size: 0.85em;
+        }
+
+        .pagination-container {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .stats-type-panel {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stats-type-btn {
+            width: 100%;
+            text-align: center;
+        }
+
+        .common-stats {
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+    }
+</style>
+
+<div class="stats-container">
+    <div class="page-header">
+        <h1 class="page-title">
+            <i class="fas fa-chart-bar" style="margin-right: 15px; color: #ff6b35;"></i>
+            Полная статистика игроков NBA
+        </h1>
+    </div>
+
+    <div class="stats-type-panel">
+        <a href="@Url.Action("FullStats", new { type = "main", sortBy = "PTS", page = 1 })"
+           class="stats-type-btn @(Model.StatsType == "main" ? "active" : "")">
+            <i class="fas fa-chart-line"></i> Основная статистика
+        </a>
+        <a href="@Url.Action("FullStats", new { type = "shooting", sortBy = "FGM", page = 1 })"
+           class="stats-type-btn @(Model.StatsType == "shooting" ? "active" : "")">
+            <i class="fas fa-bullseye"></i> Статистика бросков
+        </a>
+    </div>
+
+    <div class="table-container">
+        <div class="table-wrapper">
+            @if (Model.StatsType == "main")
+            {
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="sticky-col-header">Игрок</th>
+                            <th>Поз</th>
+                            <th>GP</th>
+                            <th>MIN</th>
+                            <th onclick="window.location.href='@Url.Action("FullStats", new { type = "main", sortBy = GetNewSortBy("PTS"), page = 1 })'"
+                                class="sortable @(Model.SortBy.Replace("_desc", "") == "PTS" ? "active-sort" : "")">
+                                PTS
+                                <span class="sort-icon">
+                                    @if (Model.SortBy == "PTS")
+                                    {
+                                        <i class="fas fa-arrow-down"></i>
+                                    }
+                                    @if (Model.SortBy == "PTS_desc")
+                                    {
+                                        <i class="fas fa-arrow-up"></i>
+                                    }
+                                </span>
+                            </th>
+                            <th onclick="window.location.href='@Url.Action("FullStats", new { type = "main", sortBy = GetNewSortBy("REB"), page = 1 })'"
+                                class="sortable @(Model.SortBy.Replace("_desc", "") == "REB" ? "active-sort" : "")">
+                                REB
+                                <span class="sort-icon">
+                                    @if (Model.SortBy == "REB")
+                                    {
+                                        <i class="fas fa-arrow-down"></i>
+                                    }
+                                    @if (Model.SortBy == "REB_desc")
+                                    {
+                                        <i class="fas fa-arrow-up"></i>
+                                    }
+                                </span>
+                            </th>
+                            <th onclick="window.location.href='@Url.Action("FullStats", new { type = "main", sortBy = GetNewSortBy("AST"), page = 1 })'"
+                                class="sortable @(Model.SortBy.Replace("_desc", "") == "AST" ? "active-sort" : "")">
+                                AST
+                                <span class="sort-icon">
+                                    @if (Model.SortBy == "AST")
+                                    {
+                                        <i class="fas fa-arrow-down"></i>
+                                    }
+                                    @if (Model.SortBy == "AST_desc")
+                                    {
+                                        <i class="fas fa-arrow-up"></i>
+                                    }
+                                </span>
+                            </th>
+                            <th onclick="window.location.href='@Url.Action("FullStats", new { type = "main", sortBy = GetNewSortBy("STL"), page = 1 })'"
+                                class="sortable @(Model.SortBy.Replace("_desc", "") == "STL" ? "active-sort" : "")">
+                                STL
+                                <span class="sort-icon">
+                                    @if (Model.SortBy == "STL")
+                                    {
+                                        <i class="fas fa-arrow-down"></i>
+                                    }
+                                    @if (Model.SortBy == "STL_desc")
+                                    {
+                                        <i class="fas fa-arrow-up"></i>
+                                    }
+                                </span>
+                            </th>
+                            <th onclick="window.location.href='@Url.Action("FullStats", new { type = "main", sortBy = GetNewSortBy("BLK"), page = 1 })'"
+                                class="sortable @(Model.SortBy.Replace("_desc", "") == "BLK" ? "active-sort" : "")">
+                                BLK
+                                <span class="sort-icon">
+                                    @if (Model.SortBy == "BLK")
+                                    {
+                                        <i class="fas fa-arrow-down"></i>
+                                    }
+                                    @if (Model.SortBy == "BLK_desc")
+                                    {
+                                        <i class="fas fa-arrow-up"></i>
+                                    }
+                                </span>
+                            </th>
+                            <th onclick="window.location.href='@Url.Action("FullStats", new { type = "main", sortBy = GetNewSortBy("TO"), page = 1 })'"
+                                class="sortable @(Model.SortBy.Replace("_desc", "") == "TO" ? "active-sort" : "")">
+                                TO
+                                <span class="sort-icon">
+                                    @if (Model.SortBy == "TO")
+                                    {
+                                        <i class="fas fa-arrow-down"></i>
+                                    }
+                                    @if (Model.SortBy == "TO_desc")
+                                    {
+                                        <i class="fas fa-arrow-up"></i>
+                                    }
+                                </span>
+                            </th>
+                            <th onclick="window.location.href='@Url.Action("FullStats", new { type = "main", sortBy = GetNewSortBy("DD2"), page = 1 })'"
+                                class="sortable @(Model.SortBy.Replace("_desc", "") == "DD2" ? "active-sort" : "")">
+                                DD2
+                                <span class="sort-icon">
+                                    @if (Model.SortBy == "DD2")
+                                    {
+                                        <i class="fas fa-arrow-down"></i>
+                                    }
+                                    @if (Model.SortBy == "DD2_desc")
+                                    {
+                                        <i class="fas fa-arrow-up"></i>
+                                    }
+                                </span>
+                            </th>
+                            <th onclick="window.location.href='@Url.Action("FullStats", new { type = "main", sortBy = GetNewSortBy("TD3"), page = 1 })'"
+                                class="sortable @(Model.SortBy.Replace("_desc", "") == "TD3" ? "active-sort" : "")">
+                                TD3
+                                <span class="sort-icon">
+                                    @if (Model.SortBy == "TD3")
+                                    {
+                                        <i class="fas fa-arrow-down"></i>
+                                    }
+                                    @if (Model.SortBy == "TD3_desc")
+                                    {
+                                        <i class="fas fa-arrow-up"></i>
+                                    }
+                                </span>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var player in Model.Players)
+                        {
+                            <tr>
+                                <td class="sticky-col">
+                                    <div class="player-cell">
+                                        <img src="@player.HeadshotUrl" class="player-image" alt="@player.Name"
+                                             onerror="this.onerror=null; this.src='https://a.espncdn.com/i/headshots/nba/players/full/0.png';">
+                                        <a href="@Url.Action("PlayersPage", "PlayersPage", new { playerId = player.Id })" class="player-name-link">
+                                            @player.Name
+                                        </a>
+                                        <a href="@Url.Action("TeamDetails", "Team", new { abbrev = player.Team })" class="team-badge-link">
+                                            <span class="team-badge">@player.Team</span>
+                                        </a>
+                                    </div>
+                                </td>
+                                <td>@player.Position</td>
+                                <td>@player.GamesPlayed</td>
+                                <td class="stat-compact">@player.Minutes.ToString("F1")</td>
+                                <td class="stat-compact @(Model.SortBy.Replace("_desc", "") == "PTS" ? "sort-column" : "")">@player.Points.ToString("F1")</td>
+                                <td class="stat-compact @(Model.SortBy.Replace("_desc", "") == "REB" ? "sort-column" : "")">@player.Rebounds.ToString("F1")</td>
+                                <td class="stat-compact @(Model.SortBy.Replace("_desc", "") == "AST" ? "sort-column" : "")">@player.Assists.ToString("F1")</td>
+                                <td class="stat-compact @(Model.SortBy.Replace("_desc", "") == "STL" ? "sort-column" : "")">@player.Steals.ToString("F1")</td>
+                                <td class="stat-compact @(Model.SortBy.Replace("_desc", "") == "BLK" ? "sort-column" : "")">@player.Blocks.ToString("F1")</td>
+                                <td class="stat-compact @(Model.SortBy.Replace("_desc", "") == "TO" ? "sort-column" : "")">@player.Turnovers.ToString("F1")</td>
+                                <td class="@(Model.SortBy.Replace("_desc", "") == "DD2" ? "sort-column" : "")">@player.DoubleDoubles</td>
+                                <td class="@(Model.SortBy.Replace("_desc", "") == "TD3" ? "sort-column" : "")">@player.TripleDoubles</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="sticky-col-header">Игрок</th>
+                            <th>Поз</th>
+                            <th>GP</th>
+                            <th>MIN</th>
+                            <th onclick="window.location.href='@Url.Action("FullStats", new { type = "shooting", sortBy = GetNewSortBy("FGM"), page = 1 })'"
+                                class="sortable @(Model.SortBy.Replace("_desc", "") == "FGM" ? "active-sort" : "")">
+                                FGM
+                                <span class="sort-icon">
+                                    @if (Model.SortBy == "FGM")
+                                    {
+                                        <i class="fas fa-arrow-down"></i>
+                                    }
+                                    @if (Model.SortBy == "FGM_desc")
+                                    {
+                                        <i class="fas fa-arrow-up"></i>
+                                    }
+                                </span>
+                            </th>
+                            <th onclick="window.location.href='@Url.Action("FullStats", new { type = "shooting", sortBy = GetNewSortBy("FGA"), page = 1 })'"
+                                class="sortable @(Model.SortBy.Replace("_desc", "") == "FGA" ? "active-sort" : "")">
+                                FGA
+                                <span class="sort-icon">
+                                    @if (Model.SortBy == "FGA")
+                                    {
+                                        <i class="fas fa-arrow-down"></i>
+                                    }
+                                    @if (Model.SortBy == "FGA_desc")
+                                    {
+                                        <i class="fas fa-arrow-up"></i>
+                                    }
+                                </span>
+                            </th>
+                            <th onclick="window.location.href='@Url.Action("FullStats", new { type = "shooting", sortBy = GetNewSortBy("FG%"), page = 1 })'"
+                                class="sortable @(Model.SortBy.Replace("_desc", "") == "FG%" ? "active-sort" : "")">
+                                FG%
+                                <span class="sort-icon">
+                                    @if (Model.SortBy == "FG%")
+                                    {
+                                        <i class="fas fa-arrow-down"></i>
+                                    }
+                                    @if (Model.SortBy == "FG%_desc")
+                                    {
+                                        <i class="fas fa-arrow-up"></i>
+                                    }
+                                </span>
+                            </th>
+                            <th onclick="window.location.href='@Url.Action("FullStats", new { type = "shooting", sortBy = GetNewSortBy("3PM"), page = 1 })'"
+                                class="sortable @(Model.SortBy.Replace("_desc", "") == "3PM" ? "active-sort" : "")">
+                                3PM
+                                <span class="sort-icon">
+                                    @if (Model.SortBy == "3PM")
+                                    {
+                                        <i class="fas fa-arrow-down"></i>
+                                    }
+                                    @if (Model.SortBy == "3PM_desc")
+                                    {
+                                        <i class="fas fa-arrow-up"></i>
+                                    }
+                                </span>
+                            </th>
+                            <th onclick="window.location.href='@Url.Action("FullStats", new { type = "shooting", sortBy = GetNewSortBy("3PA"), page = 1 })'"
+                                class="sortable @(Model.SortBy.Replace("_desc", "") == "3PA" ? "active-sort" : "")">
+                                3PA
+                                <span class="sort-icon">
+                                    @if (Model.SortBy == "3PA")
+                                    {
+                                        <i class="fas fa-arrow-down"></i>
+                                    }
+                                    @if (Model.SortBy == "3PA_desc")
+                                    {
+                                        <i class="fas fa-arrow-up"></i>
+                                    }
+                                </span>
+                            </th>
+                            <th onclick="window.location.href='@Url.Action("FullStats", new { type = "shooting", sortBy = GetNewSortBy("3P%"), page = 1 })'"
+                                class="sortable @(Model.SortBy.Replace("_desc", "") == "3P%" ? "active-sort" : "")">
+                                3P%
+                                <span class="sort-icon">
+                                    @if (Model.SortBy == "3P%")
+                                    {
+                                        <i class="fas fa-arrow-down"></i>
+                                    }
+                                    @if (Model.SortBy == "3P%_desc")
+                                    {
+                                        <i class="fas fa-arrow-up"></i>
+                                    }
+                                </span>
+                            </th>
+                            <th onclick="window.location.href='@Url.Action("FullStats", new { type = "shooting", sortBy = GetNewSortBy("FTM"), page = 1 })'"
+                                class="sortable @(Model.SortBy.Replace("_desc", "") == "FTM" ? "active-sort" : "")">
+                                FTM
+                                <span class="sort-icon">
+                                    @if (Model.SortBy == "FTM")
+                                    {
+                                        <i class="fas fa-arrow-down"></i>
+                                    }
+                                    @if (Model.SortBy == "FTM_desc")
+                                    {
+                                        <i class="fas fa-arrow-up"></i>
+                                    }
+                                </span>
+                            </th>
+                            <th onclick="window.location.href='@Url.Action("FullStats", new { type = "shooting", sortBy = GetNewSortBy("FTA"), page = 1 })'"
+                                class="sortable @(Model.SortBy.Replace("_desc", "") == "FTA" ? "active-sort" : "")">
+                                FTA
+                                <span class="sort-icon">
+                                    @if (Model.SortBy == "FTA")
+                                    {
+                                        <i class="fas fa-arrow-down"></i>
+                                    }
+                                    @if (Model.SortBy == "FTA_desc")
+                                    {
+                                        <i class="fas fa-arrow-up"></i>
+                                    }
+                                </span>
+                            </th>
+                            <th onclick="window.location.href='@Url.Action("FullStats", new { type = "shooting", sortBy = GetNewSortBy("FT%"), page = 1 })'"
+                                class="sortable @(Model.SortBy.Replace("_desc", "") == "FT%" ? "active-sort" : "")">
+                                FT%
+                                <span class="sort-icon">
+                                    @if (Model.SortBy == "FT%")
+                                    {
+                                        <i class="fas fa-arrow-down"></i>
+                                    }
+                                    @if (Model.SortBy == "FT%_desc")
+                                    {
+                                        <i class="fas fa-arrow-up"></i>
+                                    }
+                                </span>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var player in Model.Players)
+                        {
+                            <tr>
+                                <td class="sticky-col">
+                                    <div class="player-cell">
+                                        <img src="@player.HeadshotUrl" class="player-image" alt="@player.Name"
+                                             onerror="this.onerror=null; this.src='https://a.espncdn.com/i/headshots/nba/players/full/0.png';">
+                                        <a href="@Url.Action("PlayersPage", "PlayersPage", new { playerId = player.Id })" class="player-name-link">
+                                            @player.Name
+                                        </a>
+                                        <a href="@Url.Action("TeamDetails", "Team", new { abbrev = player.Team })" class="team-badge-link">
+                                            <span class="team-badge">@player.Team</span>
+                                        </a>
+                                    </div>
+                                </td>
+                                <td>@player.Position</td>
+                                <td>@player.GamesPlayed</td>
+                                <td class="stat-compact">@player.Minutes.ToString("F1")</td>
+                                <td class="stat-compact @(Model.SortBy.Replace("_desc", "") == "FGM" ? "sort-column" : "")">@player.FGM.ToString("F1")</td>
+                                <td class="stat-compact @(Model.SortBy.Replace("_desc", "") == "FGA" ? "sort-column" : "")">@player.FGA.ToString("F1")</td>
+                                <td class="stat-compact @(Model.SortBy.Replace("_desc", "") == "FG%" ? "sort-column" : "")">@player.FGPct.ToString("F1")</td>
+                                <td class="stat-compact @(Model.SortBy.Replace("_desc", "") == "3PM" ? "sort-column" : "")">@player.ThreePM.ToString("F1")</td>
+                                <td class="stat-compact @(Model.SortBy.Replace("_desc", "") == "3PA" ? "sort-column" : "")">@player.ThreePA.ToString("F1")</td>
+                                <td class="stat-compact @(Model.SortBy.Replace("_desc", "") == "3P%" ? "sort-column" : "")">@player.ThreePPct.ToString("F1")</td>
+                                <td class="stat-compact @(Model.SortBy.Replace("_desc", "") == "FTM" ? "sort-column" : "")">@player.FTM.ToString("F1")</td>
+                                <td class="stat-compact @(Model.SortBy.Replace("_desc", "") == "FTA" ? "sort-column" : "")">@player.FTA.ToString("F1")</td>
+                                <td class="stat-compact @(Model.SortBy.Replace("_desc", "") == "FT%" ? "sort-column" : "")">@player.FTPct.ToString("F1")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+
+    @if (Model.TotalPages > 1)
+    {
+        <div class="pagination-container">
+            <div class="pagination-info">
+                Показано @Model.Players.Count из @Model.TotalPlayers игроков
+            </div>
+            <div class="pagination">
+                @if (Model.CurrentPage > 1)
+                {
+                    <a href="@Url.Action("FullStats", new { type = Model.StatsType, sortBy = Model.SortBy, page = Model.CurrentPage - 1 })" class="page-btn">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                }
+
+                @{
+                    int startPage = Math.Max(1, Model.CurrentPage - 2);
+                    int endPage = Math.Min(Model.TotalPages, Model.CurrentPage + 2);
+
+                    if (startPage > 1)
+                    {
+                        <a href="@Url.Action("FullStats", new { type = Model.StatsType, sortBy = Model.SortBy, page = 1 })" class="page-btn">1</a>
+                        if (startPage > 2)
+                        {
+                            <span class="page-dots">...</span>
+                        }
+                    }
+
+                    for (int i = startPage; i <= endPage; i++)
+                    {
+                        <a href="@Url.Action("FullStats", new { type = Model.StatsType, sortBy = Model.SortBy, page = i })"
+                           class="page-btn @(i == Model.CurrentPage ? "active" : "")">@i</a>
+                    }
+
+                    if (endPage < Model.TotalPages)
+                    {
+                        if (endPage < Model.TotalPages - 1)
+                        {
+                            <span class="page-dots">...</span>
+                        }
+                        <a href="@Url.Action("FullStats", new { type = Model.StatsType, sortBy = Model.SortBy, page = Model.TotalPages })"
+                           class="page-btn">@Model.TotalPages</a>
+                    }
+                }
+
+                @if (Model.CurrentPage < Model.TotalPages)
+                {
+                    <a href="@Url.Action("FullStats", new { type = Model.StatsType, sortBy = Model.SortBy, page = Model.CurrentPage + 1 })" class="page-btn">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                }
+            </div>
+        </div>
+    }
+
+    <div class="glossary">
+        @if (Model.StatsType == "main")
+        {
+            <div class="glossary-grid">
+                <div class="glossary-item"><strong>GP</strong> - Игр сыграно</div>
+                <div class="glossary-item"><strong>MIN</strong> - Минуты за игру</div>
+                <div class="glossary-item"><strong>PTS</strong> - Очки за игру</div>
+                <div class="glossary-item"><strong>REB</strong> - Подборы за игру</div>
+                <div class="glossary-item"><strong>AST</strong> - Передачи за игру</div>
+                <div class="glossary-item"><strong>STL</strong> - Перехваты за игру</div>
+                <div class="glossary-item"><strong>BLK</strong> - Блок-шоты за игру</div>
+                <div class="glossary-item"><strong>TO</strong> - Потери за игру</div>
+                <div class="glossary-item"><strong>DD2</strong> - Дабл-даблы</div>
+                <div class="glossary-item"><strong>TD3</strong> - Трипл-даблы</div>
+            </div>
+        }
+        else
+        {
+            <div class="glossary-grid">
+                <div class="glossary-item"><strong>GP</strong> - Игр сыграно</div>
+                <div class="glossary-item"><strong>MIN</strong> - Минуты за игру</div>
+                <div class="glossary-item"><strong>FGM</strong> - Заброшено с игры</div>
+                <div class="glossary-item"><strong>FGA</strong> - Попыток с игры</div>
+                <div class="glossary-item"><strong>FG%</strong> - % попаданий</div>
+                <div class="glossary-item"><strong>3PM</strong> - 3-очковые за игру</div>
+                <div class="glossary-item"><strong>3PA</strong> - Попыток 3-очковых</div>
+                <div class="glossary-item"><strong>3P%</strong> - % 3-очковых</div>
+                <div class="glossary-item"><strong>FTM</strong> - Штрафные за игру</div>
+                <div class="glossary-item"><strong>FTA</strong> - Попыток штрафных</div>
+                <div class="glossary-item"><strong>FT%</strong> - % штрафных</div>
+            </div>
+        }
+    </div>
+
+    <div class="text-center">
+        <a href="javascript:history.back()" class="back-button">
+            <i class="fas fa-arrow-left"></i> Назад
+        </a>
+    </div>
+</div>

@@ -1,0 +1,542 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="NBA_Website.Controllers.ArticleController" Collapsed="true">
+    <Position X="1.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAIEAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Controllers\ArticleController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NBA_Website.Controllers.CalendarController" Collapsed="true">
+    <Position X="3.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAABAAAAAAAAAAAAAAAAAAAAEAAEAAAAAAAA=</HashCode>
+      <FileName>Controllers\CalendarController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NBA_Website.Controllers.DepthChartController" Collapsed="true">
+    <Position X="5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAA=</HashCode>
+      <FileName>Controllers\DepthChartController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NBA_Website.Controllers.FullStatsController" Collapsed="true">
+    <Position X="6.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIA=</HashCode>
+      <FileName>Controllers\FullStatsController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NBA_Website.Controllers.HomeController" Collapsed="true">
+    <Position X="1.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAQCAAAEAAAAAAAA=</HashCode>
+      <FileName>Controllers\HomeController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NBA_Website.Controllers.InjuriesController" Collapsed="true">
+    <Position X="3.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAIAAAAAAAAAAAAAAAAQAAAAAAAAAAAA=</HashCode>
+      <FileName>Controllers\InjuriesController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NBA_Website.Controllers.LeadersController" Collapsed="true">
+    <Position X="5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAABAAAAAAA=</HashCode>
+      <FileName>Controllers\LeadersController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NBA_Website.Controllers.MatchController" Collapsed="true">
+    <Position X="6.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAgAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Controllers\MatchController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NBA_Website.Controllers.NBAController" Collapsed="true">
+    <Position X="1.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAACAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAQAAQA=</HashCode>
+      <FileName>Controllers\NBAController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NBA_Website.Controllers.PlayersPageController" Collapsed="true">
+    <Position X="5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAIIAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Controllers\PlayersPageController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NBA_Website.Controllers.RosterController" Collapsed="true">
+    <Position X="6.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAgEAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Controllers\RosterController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NBA_Website.Controllers.ScheduleController" Collapsed="true">
+    <Position X="1.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAQ=</HashCode>
+      <FileName>Controllers\ScheduleController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NBA_Website.Controllers.SearchController" Collapsed="true">
+    <Position X="3.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EJQAAgAIAACACCAQABAAIAAEAwAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Controllers\SearchController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NBA_Website.Controllers.PlayerSearchItem" Collapsed="true">
+    <Position X="3.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAggAAAAAQAAAAAACAAAAAAAAAAAAA=</HashCode>
+      <FileName>Controllers\SearchController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NBA_Website.Controllers.TeamController" Collapsed="true">
+    <Position X="5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAEAAAAAAAQAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Controllers\TeamController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NBA_Website.Models.ArticleViewModel">
+    <Position X="25.75" Y="8.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACCAAAAgAgAAAACAAAAAAAAAAAAAAAABAAAAAAgAA=</HashCode>
+      <FileName>Models\ArticleViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NBA_Website.Models.CalendarViewModel">
+    <Position X="33.25" Y="11" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAICAAAAAAAAQAAAAAQAAAAAAQAAAAAAQIABAAAA=</HashCode>
+      <FileName>Models\CalendarViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NBA_Website.Models.CalendarGame">
+    <Position X="27.75" Y="11" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAADEFAAAIAAAAIAAAAAAAQIAAAACIABAAAAUAApAAA=</HashCode>
+      <FileName>Models\CalendarViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NBA_Website.Models.CalendarGameTeam">
+    <Position X="27.75" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACEQBAAAAAAAgAEAIAAAAAAAAAAAAAAEAAgAAAQAA=</HashCode>
+      <FileName>Models\CalendarViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NBA_Website.Models.DepthChartViewModel">
+    <Position X="33.5" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAEAAAAEAAgAIAAAADAAAAAEAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\DepthChartViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NBA_Website.Models.PositionDepth">
+    <Position X="17.75" Y="8.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAABAAAAAAAAAAAAAAAAAAAAAQCAABAAAAAAIAAAAAA=</HashCode>
+      <FileName>Models\DepthChartViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NBA_Website.Models.DepthAthlete">
+    <Position X="30" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAECEAAAAAAAAAAAAAAAAAAAAAAAAKAAAAAAAAAACAA=</HashCode>
+      <FileName>Models\DepthChartViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NBA_Website.Models.Lineup">
+    <Position X="19.5" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAQAAAAgAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\DepthChartViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NBA_Website.Models.LineupPlayer">
+    <Position X="21.25" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAQAAAAA=</HashCode>
+      <FileName>Models\DepthChartViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NBA_Website.Models.FullStatsViewModel">
+    <Position X="23.75" Y="8.25" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAgAEAAAACAAAAAAAQAAAAAAgAAAAAAAAEAAAAAI=</HashCode>
+      <FileName>Models\FullStatsViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NBA_Website.Models.PlayerFullStats">
+    <Position X="24.25" Y="11" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AGEGgCgAAAAggAAgQAAAAAQAAAAAACAAEIMQBQAAAAI=</HashCode>
+      <FileName>Models\FullStatsViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NBA_Website.Models.InjuriesViewModel">
+    <Position X="33.25" Y="13.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAEAAAAEAAgAAAAQADAAAAAAAAAAAAIAAAAAA=</HashCode>
+      <FileName>Models\InjuriesViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NBA_Website.Models.InjuredPlayer">
+    <Position X="31.75" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAACEGAEAAAAgAAgAAEAIAAQAAAAACEAAACgAAAAAAg=</HashCode>
+      <FileName>Models\InjuriesViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NBA_Website.Models.LeadersViewModel">
+    <Position X="35.25" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABAAAACAEAAAAAAAAAAICAAAAAAAAAACAAAAAAAAAA=</HashCode>
+      <FileName>Models\LeadersViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NBA_Website.Models.PlayerLeaders">
+    <Position X="28.25" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEBAAAAAAAAAAAAgAAAAAAAAAAAACAAAAAoAAAAAAA=</HashCode>
+      <FileName>Models\LeadersViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NBA_Website.Models.MatchViewModel">
+    <Position X="35" Y="10" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQCAAAAAIAAAAAAAAAAAAAIgAAAAAABAAgAUAAhAAA=</HashCode>
+      <FileName>Models\MatchViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NBA_Website.Models.MatchTeam">
+    <Position X="35" Y="13.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAACEQBAAAAAAAgEEAIAAAAAAAAAAAAAAEAAgAAAQAA=</HashCode>
+      <FileName>Models\MatchViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NBA_Website.Models.MatchPlayer">
+    <Position X="31.25" Y="11" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>IAAXEAAAAAAogAAgQAACAAAAAABAAqAACAMgBAEAAAA=</HashCode>
+      <FileName>Models\MatchViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NBA_Website.Models.MatchLeaders">
+    <Position X="24.75" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAEAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\MatchViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NBA_Website.Models.TeamLeaders">
+    <Position X="17.75" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAQAAAAAAAACAAAAAAAAAAAACAAAAAAAA=</HashCode>
+      <FileName>Models\MatchViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NBA_Website.Models.PlayerLeader">
+    <Position X="26.5" Y="6.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoAAAAAAA=</HashCode>
+      <FileName>Models\MatchViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NBA_Website.Models.NewsViewModel">
+    <Position X="22" Y="8.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABACSAAAAAAgAAAACAAAAAAAAAAAAAAAABAAAAAAgAA=</HashCode>
+      <FileName>Models\NewsViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NBA_Website.Models.PlayersPageViewModel">
+    <Position X="16" Y="11" Width="2" />
+    <TypeIdentifier>
+      <HashCode>ADJCE2AQBAQADIAggEEAgAIABCAAAKAAAAAgEAAAAAo=</HashCode>
+      <FileName>Models\PlayersPageViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NBA_Website.Models.PlayerItem">
+    <Position X="23" Y="6.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAggAAAAAQAAAAAACAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\PlayersPageViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NBA_Website.Models.PlayerStats">
+    <Position X="18.25" Y="11" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAEAAACAIoogAwAQCAAAAAAAgoAQQAAAAMABUAAIAM=</HashCode>
+      <FileName>Models\PlayersPageViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NBA_Website.Models.PlayerGameLog">
+    <Position X="29.5" Y="11" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAEAAgAAIAooAAAQCFAAAQAAAAAAQABAAMABAAAAAA=</HashCode>
+      <FileName>Models\PlayersPageViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NBA_Website.Models.RosterViewModel">
+    <Position X="20" Y="13.25" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAgAQIAEAAIAsAAgAAAQAAjQEAAAAAAAAAQAAAAIgA=</HashCode>
+      <FileName>Models\RosterViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NBA_Website.Models.ScheduleViewModel">
+    <Position X="22" Y="11" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAEAAAAFAAgAAAAAADAgAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\ScheduleViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NBA_Website.Models.GameEvent">
+    <Position X="26" Y="11" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAADEEAAAIAAAAIAAAAAAAQwAAAAAIABAAABUAApAAA=</HashCode>
+      <FileName>Models\ScheduleViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NBA_Website.Models.GameTeam">
+    <Position X="29.5" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACEQBAAAAAAAgAEAIAAAAAAAAAAAAAAEAAAAAAQAA=</HashCode>
+      <FileName>Models\ScheduleViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NBA_Website.Models.StandingViewModel">
+    <Position X="22" Y="13.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAIAAAgAAAgAAAAhAAACAABAEBIAABgAAAACAggQAA=</HashCode>
+      <FileName>Models\StandingViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NBA_Website.Models.TeamDetailViewModel">
+    <Position X="16" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAAKEABAAAggAAAAAAIAAAAAAEAYAAAgCAAAgAggAAA=</HashCode>
+      <FileName>Models\TeamDetailViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NBA_Website.Models.TeamLink">
+    <Position X="20" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAQAAgAAAAAAAAAAAAAAAABAAAAACAAAAAA=</HashCode>
+      <FileName>Models\TeamDetailViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NBA_Website.Models.TeamViewModel">
+    <Position X="20" Y="10.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAACEABAAAgAAAAAAAIAAAAAAAAAAIAAAAAAgAAAAAA=</HashCode>
+      <FileName>Models\TeamViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NBA_Website.Services.ArticleService" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="1" Y="6.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAAAAAAAAAAAAAABAAAAAAAiAABAAQAAAAQAAAAAA=</HashCode>
+      <FileName>Service\ArticleService.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="NBA_Website.Services.CalendarService" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="2.75" Y="6.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EACAAAAIAAAAAAAAADAAACAAEAAAAAAAAAAACAEAEAA=</HashCode>
+      <FileName>Service\CalendarService.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="NBA_Website.Services.DepthChartService" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="4.5" Y="6.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAEAAAABAABEAAAgAAAAAAAAABAAAAAAA=</HashCode>
+      <FileName>Service\DepthChartService.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="NBA_Website.Services.ESPNService" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="6.25" Y="6.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAAAAAAABABAAAAAAAAAAAAAQAABIAAAAA=</HashCode>
+      <FileName>Service\ESPNService.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="NBA_Website.Services.FullStatsService" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="1" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAABIAgIAgAAAABAAFAAABEACAAEAAAAAAAAAQAQ=</HashCode>
+      <FileName>Service\FullStatsService.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="NBA_Website.Services.InjuriesService" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="2.75" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAAAAAAAAAAAAAgAABAABAAAAAAAAAAAAAQAAAAAAAA=</HashCode>
+      <FileName>Service\InjuriesService.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="NBA_Website.Services.LeadersService" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="4.5" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAABCAAABAAAAAABAABAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Service\LeadersService.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="NBA_Website.Services.MatchService" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="6.25" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAEAAAABAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Service\MatchService.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="NBA_Website.Services.PlayersPageService" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="1" Y="8.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAIAAAAQAAAAAQABAABAAAgAAAAAAAAAJAgACAAAA=</HashCode>
+      <FileName>Service\PlayersPageService.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="NBA_Website.Services.RosterService" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="2.75" Y="8.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAACBAABAAAAAAAAAAAAAAEAAAAAAA=</HashCode>
+      <FileName>Service\RosterService.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="NBA_Website.Services.ScheduleService" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="4.5" Y="8.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAAAAAAAAAAAAAAAABAgBAAAAAAAAAQAAAAAAAAAEAA=</HashCode>
+      <FileName>Service\ScheduleService.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="NBA_Website.Services.StandingsService" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="6.25" Y="8.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAABAAAAAAAAAgIAABAAAAAABAAgAACAAAAgAAAAAAA=</HashCode>
+      <FileName>Service\StandingsService.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="NBA_Website.Services.TeamDetailService" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="1" Y="9.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAABAAACAAAAAAAAAAEAAAAAAAAAA=</HashCode>
+      <FileName>Service\TeamDetailService.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Interface Name="NBA_Website.Services.InterfaceArticleService" Collapsed="true">
+    <Position X="1" Y="10.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAA=</HashCode>
+      <FileName>Service\InterfaceArticleService.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="NBA_Website.Services.InterfaceCalendarService" Collapsed="true">
+    <Position X="2.75" Y="10.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Service\InterfaceCalendarService.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="NBA_Website.Services.InterfaceDepthChartService" Collapsed="true">
+    <Position X="4.5" Y="10.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Service\InterfaceDepthChartService.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="NBA_Website.Services.InterfaceESPNService" Collapsed="true">
+    <Position X="6.25" Y="10.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAABAAAAAA=</HashCode>
+      <FileName>Service\InterfaceESPNService.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="NBA_Website.Services.InterfaceFullStatsService" Collapsed="true">
+    <Position X="1" Y="11.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAA=</HashCode>
+      <FileName>Service\InterfaceFullStatsService.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="NBA_Website.Services.InterfaceInjuriesService" Collapsed="true">
+    <Position X="2.75" Y="11.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Service\InterfaceInjuriesService.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="NBA_Website.Services.InterfaceLeadersService" Collapsed="true">
+    <Position X="4.5" Y="11.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Service\InterfaceLeadersService.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="NBA_Website.Services.InterfaceMatchService" Collapsed="true">
+    <Position X="6.25" Y="11.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Service\InterfaceMatchService.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="NBA_Website.Services.InterfacePlayersPageService" Collapsed="true">
+    <Position X="1" Y="12" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAA=</HashCode>
+      <FileName>Service\InterfacePlayersPageService.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="NBA_Website.Services.InterfaceRosterService" Collapsed="true">
+    <Position X="2.75" Y="12" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAA=</HashCode>
+      <FileName>Service\InterfaceRosterService.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="NBA_Website.Services.InterfaceScheduleService" Collapsed="true">
+    <Position X="4.5" Y="12" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAA=</HashCode>
+      <FileName>Service\InterfaceScheduleService.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="NBA_Website.Services.InterfaceStandingsService" Collapsed="true">
+    <Position X="6.25" Y="12" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAA=</HashCode>
+      <FileName>Service\InterfaceStandingsService.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="NBA_Website.Services.InterfaceTeamDetailService" Collapsed="true">
+    <Position X="1" Y="12.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Service\InterfaceTeamDetailService.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

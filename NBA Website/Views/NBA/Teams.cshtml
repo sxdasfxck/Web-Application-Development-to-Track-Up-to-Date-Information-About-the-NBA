@@ -1,0 +1,442 @@
+﻿@model List<NBA_Website.Models.TeamViewModel>
+
+@{
+    ViewData["Title"] = "Команды NBA";
+}
+
+@{
+    var teamConferences = new Dictionary<int, (string Conference, string Division)>
+    {
+        { 1, ("Eastern", "Southeast") },      // Atlanta Hawks
+        { 2, ("Eastern", "Atlantic") },       // Boston Celtics
+        { 17, ("Eastern", "Atlantic") },      // Brooklyn Nets
+        { 30, ("Eastern", "Southeast") },     // Charlotte Hornets
+        { 4, ("Eastern", "Central") },        // Chicago Bulls
+        { 5, ("Eastern", "Central") },        // Cleveland Cavaliers
+        { 6, ("Western", "Southwest") },      // Dallas Mavericks
+        { 7, ("Western", "Northwest") },      // Denver Nuggets
+        { 8, ("Eastern", "Central") },        // Detroit Pistons
+        { 9, ("Western", "Pacific") },        // Golden State Warriors
+        { 10, ("Western", "Southwest") },     // Houston Rockets
+        { 11, ("Eastern", "Central") },       // Indiana Pacers
+        { 12, ("Western", "Pacific") },       // LA Clippers
+        { 13, ("Western", "Pacific") },       // Los Angeles Lakers
+        { 29, ("Western", "Southwest") },     // Memphis Grizzlies
+        { 14, ("Eastern", "Southeast") },     // Miami Heat
+        { 15, ("Eastern", "Central") },       // Milwaukee Bucks
+        { 16, ("Western", "Northwest") },     // Minnesota Timberwolves
+        { 3, ("Western", "Southwest") },      // New Orleans Pelicans
+        { 18, ("Eastern", "Atlantic") },      // New York Knicks
+        { 25, ("Western", "Northwest") },     // Oklahoma City Thunder
+        { 19, ("Eastern", "Southeast") },     // Orlando Magic
+        { 20, ("Eastern", "Atlantic") },      // Philadelphia 76ers
+        { 21, ("Western", "Pacific") },       // Phoenix Suns
+        { 22, ("Western", "Northwest") },     // Portland Trail Blazers
+        { 23, ("Western", "Pacific") },       // Sacramento Kings
+        { 24, ("Western", "Southwest") },     // San Antonio Spurs
+        { 28, ("Eastern", "Atlantic") },      // Toronto Raptors
+        { 26, ("Western", "Northwest") },     // Utah Jazz
+        { 27, ("Eastern", "Southeast") }      // Washington Wizards
+    };
+
+    var teamsWithConference = Model?.Select(team => new
+    {
+        Team = team,
+        Conference = teamConferences.ContainsKey(team.Id) ? teamConferences[team.Id].Conference : "Unknown",
+        Division = teamConferences.ContainsKey(team.Id) ? teamConferences[team.Id].Division : "Unknown"
+    }).ToList();
+
+    var groupedTeams = teamsWithConference?
+        .GroupBy(t => t.Conference)
+        .ToDictionary(
+            g => g.Key,
+            g => g.GroupBy(t => t.Division).ToDictionary(d => d.Key, d => d.ToList())
+        );
+}
+
+<style>
+    .conference-header {
+        margin: 40px 0 20px;
+        padding-bottom: 10px;
+        border-bottom: 3px solid;
+        font-size: 2em;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+    }
+
+        .conference-header.eastern {
+            border-bottom-color: #1d428a;
+            color: #1d428a;
+        }
+
+        .conference-header.western {
+            border-bottom-color: #c8102e;
+            color: #c8102e;
+        }
+
+    .division-header {
+        margin: 30px 0 15px;
+        padding-left: 15px;
+        border-left: 4px solid;
+        font-size: 1.5em;
+        font-weight: 600;
+        color: #333;
+    }
+
+        .division-header.atlantic {
+            border-left-color: #008348;
+        }
+
+        .division-header.central {
+            border-left-color: #ce1141;
+        }
+
+        .division-header.southeast {
+            border-left-color: #5a2d81;
+        }
+
+        .division-header.northwest {
+            border-left-color: #0e2240;
+        }
+
+        .division-header.pacific {
+            border-left-color: #552583;
+        }
+
+        .division-header.southwest {
+            border-left-color: #0064b1;
+        }
+
+    .teams-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    h1 {
+        text-align: center;
+        color: #1a1a1a;
+        margin-bottom: 30px;
+        font-size: 2.5em;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        border-bottom: 3px solid #ff6b35;
+        padding-bottom: 15px;
+    }
+
+    .teams-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 25px;
+        padding: 20px 0;
+    }
+
+    .team-card {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+        position: relative;
+        border: 1px solid #e0e0e0;
+    }
+
+        .team-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+        }
+
+    .team-color-strip {
+        height: 8px;
+        width: 100%;
+    }
+
+    .team-logo-container {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        padding: 25px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 180px;
+    }
+
+    .team-logo {
+        max-width: 140px;
+        max-height: 140px;
+        object-fit: contain;
+        transition: transform 0.3s ease;
+    }
+
+    .team-card:hover .team-logo {
+        transform: scale(1.1);
+    }
+
+    .team-info {
+        padding: 20px;
+        text-align: center;
+        background: white;
+    }
+
+    .team-name {
+        font-size: 1.4em;
+        font-weight: 700;
+        margin: 0 0 5px 0;
+        color: #333;
+    }
+
+    .team-location {
+        color: #666;
+        font-size: 1.1em;
+        margin-bottom: 15px;
+        font-weight: 400;
+    }
+
+    .team-details {
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+        padding: 10px 0;
+        border-top: 1px solid #eee;
+        border-bottom: 1px solid #eee;
+        margin: 10px 0;
+    }
+
+    .team-detail-item {
+        text-align: center;
+    }
+
+    .detail-label {
+        font-size: 0.8em;
+        color: #999;
+        text-transform: uppercase;
+    }
+
+    .detail-value {
+        font-size: 1.2em;
+        font-weight: 600;
+        color: #333;
+    }
+
+    .team-button {
+        background: #ff6b35;
+        color: white;
+        border: none;
+        padding: 10px 25px;
+        border-radius: 25px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        font-size: 0.9em;
+        letter-spacing: 1px;
+        margin-top: 15px;
+        width: 100%;
+    }
+
+        .team-button:hover {
+            background: #ff5420;
+            transform: scale(1.05);
+        }
+
+    .error-message {
+        background: #ffebee;
+        color: #c62828;
+        padding: 20px;
+        border-radius: 10px;
+        margin: 20px 0;
+        text-align: center;
+        border: 1px solid #ffcdd2;
+    }
+
+    .loading-spinner {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 400px;
+    }
+
+    .spinner {
+        border: 5px solid #f3f3f3;
+        border-top: 5px solid #ff6b35;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        animation: spin 1s linear infinite;
+    }
+
+    @@keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    .division-section {
+        margin-bottom: 30px;
+    }
+</style>
+
+<div class="teams-container">
+    <h1>
+        <i class="fas fa-basketball-ball" style="color: #ff6b35; margin-right: 10px;"></i>
+        Команды NBA
+    </h1>
+
+    @if (ViewBag.Error != null)
+    {
+        <div class="error-message">
+            <strong>⚠️ @ViewBag.Error</strong>
+        </div>
+    }
+
+    @if (groupedTeams != null && groupedTeams.Any())
+    {
+        if (groupedTeams.ContainsKey("Eastern"))
+        {
+            <div class="conference-header eastern">
+                <i class="fas fa-globe-americas" style="margin-right: 10px;"></i>
+                Восточная конференция
+            </div>
+
+            @foreach (var division in groupedTeams["Eastern"])
+            {
+                <div class="division-header @division.Key.ToLower()">
+                    <i class="fas fa-layer-group" style="margin-right: 10px;"></i>
+                    @division.Key
+                </div>
+
+                <div class="teams-grid">
+                    @foreach (var item in division.Value)
+                    {
+                        var team = item.Team;
+                        <div class="team-card">
+                            <div class="team-color-strip" style="background: linear-gradient(90deg, #@team.Color 0%, #@(team.AlternateColor ?? team.Color) 100%);"></div>
+
+                            <div class="team-logo-container">
+                                @if (!string.IsNullOrEmpty(team.LogoUrl))
+                                {
+                                    <img src="@team.LogoUrl" class="team-logo" alt="@team.DisplayName" onerror="this.onerror=null; this.src='https://via.placeholder.com/140?text=@team.ShortName'">
+                                }
+                                else
+                                {
+                                    <div style="width: 140px; height: 140px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; border-radius: 50%;">
+                                        <span style="font-size: 2em; color: #999;">@team.ShortName?.Substring(0, Math.Min(3, team.ShortName?.Length ?? 0))</span>
+                                    </div>
+                                }
+                            </div>
+
+                            <div class="team-info">
+                                <h2 class="team-name">@team.DisplayName</h2>
+                                <p class="team-location">@team.Location</p>
+
+                                <div class="team-details">
+                                    <div class="team-detail-item">
+                                        <div class="detail-label">Псевдоним</div>
+                                        <div class="detail-value">@team.ShortName</div>
+                                    </div>
+                                    <div class="team-detail-item">
+                                        <div class="detail-label">Аббревиатура</div>
+                                        <div class="detail-value">@team.Abbreviation</div>
+                                    </div>
+                                </div>
+
+                                <a href="@Url.Action("TeamDetails", "Team", new { abbrev = team.Abbreviation })" class="team-button">
+                                    <i class="fas fa-info-circle"></i> Подробнее
+                                </a>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        }
+
+        if (groupedTeams.ContainsKey("Western"))
+        {
+            <div class="conference-header western">
+                <i class="fas fa-globe-asia" style="margin-right: 10px;"></i>
+                Западная конференция
+            </div>
+
+            @foreach (var division in groupedTeams["Western"])
+            {
+                <div class="division-header @division.Key.ToLower()">
+                    <i class="fas fa-layer-group" style="margin-right: 10px;"></i>
+                    @division.Key
+                </div>
+
+                <div class="teams-grid">
+                    @foreach (var item in division.Value)
+                    {
+                        var team = item.Team;
+                        <div class="team-card">
+                            <div class="team-color-strip" style="background: linear-gradient(90deg, #@team.Color 0%, #@(team.AlternateColor ?? team.Color) 100%);"></div>
+
+                            <div class="team-logo-container">
+                                @if (!string.IsNullOrEmpty(team.LogoUrl))
+                                {
+                                    <img src="@team.LogoUrl" class="team-logo" alt="@team.DisplayName" onerror="this.onerror=null; this.src='https://via.placeholder.com/140?text=@team.ShortName'">
+                                }
+                                else
+                                {
+                                    <div style="width: 140px; height: 140px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; border-radius: 50%;">
+                                        <span style="font-size: 2em; color: #999;">@team.ShortName?.Substring(0, Math.Min(3, team.ShortName?.Length ?? 0))</span>
+                                    </div>
+                                }
+                            </div>
+
+                            <div class="team-info">
+                                <h2 class="team-name">@team.DisplayName</h2>
+                                <p class="team-location">@team.Location</p>
+
+                                <div class="team-details">
+                                    <div class="team-detail-item">
+                                        <div class="detail-label">Псевдоним</div>
+                                        <div class="detail-value">@team.ShortName</div>
+                                    </div>
+                                    <div class="team-detail-item">
+                                        <div class="detail-label">Аббревиатура</div>
+                                        <div class="detail-value">@team.Abbreviation</div>
+                                    </div>
+                                </div>
+
+                                <a href="@Url.Action("TeamDetails", "Team", new { abbrev = team.Abbreviation })" class="team-button">
+                                    <i class="fas fa-info-circle"></i> Подробнее
+                                </a>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        }
+    }
+    else
+    {
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+        </div>
+    }
+</div>
+
+<script>
+    function showTeamDetails(teamName) {
+        alert('Страница команды ' + teamName);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const cards = document.querySelectorAll('.team-card');
+        cards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+                card.style.transition = 'all 0.5s ease';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, index * 100);
+        });
+    });
+</script>

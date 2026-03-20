@@ -1,0 +1,777 @@
+﻿@model NBA_Website.Models.InjuriesViewModel
+
+@{
+    ViewData["Title"] = $"Травмы {Model.TeamName}";
+}
+
+<style>
+    .injuries-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 30px 20px;
+    }
+
+    .team-header {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 20px;
+        padding: 40px;
+        margin-bottom: 30px;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid #e0e0e0;
+    }
+
+        .team-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 8px;
+            background: linear-gradient(90deg, # @Model.TeamColor 0%, # @Model.TeamColor 100%);
+        }
+
+    .team-header-content {
+        display: flex;
+        align-items: center;
+        gap: 40px;
+        flex-wrap: wrap;
+    }
+
+    .team-logo {
+        width: 150px;
+        height: 150px;
+        object-fit: contain;
+        filter: drop-shadow(0 10px 20px rgba(0,0,0,0.2));
+        background: white;
+        border-radius: 50%;
+        padding: 20px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .team-title {
+        flex: 1;
+    }
+
+    .team-name {
+        font-size: 2.5em;
+        font-weight: 800;
+        color: #1a1a1a;
+        margin-bottom: 10px;
+        letter-spacing: -0.02em;
+    }
+
+    .team-season {
+        font-size: 1.2em;
+        color: #666;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .team-badges {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .badge {
+        background: #ff6b35;
+        color: white;
+        padding: 8px 20px;
+        border-radius: 25px;
+        font-size: 1em;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .badge-outline {
+        background: transparent;
+        color: #666;
+        border: 1px solid #ddd;
+    }
+
+    .summary-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin: 30px 0;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        text-align: center;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        border: 1px solid #e0e0e0;
+    }
+
+    .stat-label {
+        font-size: 0.9em;
+        color: #999;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+    }
+
+    .stat-value {
+        font-size: 2.5em;
+        font-weight: 700;
+        color: #e74c3c;
+    }
+
+    .players-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+        gap: 25px;
+        margin-top: 30px;
+    }
+
+    .player-card {
+        background: white;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        border: 1px solid #e0e0e0;
+        transition: transform 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        text-decoration: none;
+        color: inherit;
+        cursor: default;
+    }
+
+        .player-card.clickable {
+            cursor: pointer;
+        }
+
+            .player-card.clickable:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+            }
+
+                .player-card.clickable:hover .player-name {
+                    color: #ff6b35;
+                }
+
+    .player-header {
+        height: 8px;
+        width: 100%;
+        background: linear-gradient(90deg, #e74c3c 0%, #c0392b 100%);
+    }
+
+    .player-image-container {
+        padding: 30px 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: #f5f5f5;
+        height: 220px;
+        position: relative;
+    }
+
+    .player-image {
+        max-width: 140px;
+        max-height: 140px;
+        object-fit: contain;
+        border-radius: 50%;
+        background: white;
+        padding: 5px;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease;
+    }
+
+    .player-card.clickable:hover .player-image {
+        transform: scale(1.05);
+    }
+
+    .injury-badge {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: #e74c3c;
+        color: white;
+        padding: 6px 15px;
+        border-radius: 20px;
+        font-size: 0.9em;
+        font-weight: 600;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+        .injury-badge i {
+            margin-right: 5px;
+        }
+
+    .player-info {
+        padding: 25px;
+    }
+
+    .player-name {
+        font-size: 1.6em;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 15px;
+        text-align: center;
+        transition: color 0.2s ease;
+    }
+
+    .player-position {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .player-position-badge {
+        display: inline-block;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        color: #e74c3c;
+        padding: 10px 25px;
+        border-radius: 40px;
+        font-size: 1.1em;
+        font-weight: 600;
+        border: 2px solid #e74c3c;
+        box-shadow: 0 3px 8px rgba(231, 76, 60, 0.1);
+    }
+
+    .injury-details {
+        background: #f8f9fa;
+        border-radius: 15px;
+        padding: 20px;
+        margin: 20px 0;
+    }
+
+    .injury-type {
+        display: inline-block;
+        background: #e74c3c;
+        color: white;
+        padding: 6px 15px;
+        border-radius: 20px;
+        font-size: 0.95em;
+        font-weight: 600;
+        margin-bottom: 15px;
+    }
+
+    .injury-comment {
+        font-size: 1em;
+        line-height: 1.5;
+        color: #555;
+        margin-bottom: 15px;
+        max-height: 100px;
+        overflow-y: auto;
+        padding-right: 5px;
+    }
+
+    .injury-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-top: 15px;
+        font-size: 0.95em;
+        color: #888;
+    }
+
+        .injury-meta i {
+            color: #e74c3c;
+            width: 18px;
+            margin-right: 5px;
+        }
+
+    .status-badge {
+        display: inline-block;
+        background: #f39c12;
+        color: white;
+        padding: 6px 15px;
+        border-radius: 20px;
+        font-size: 0.95em;
+        font-weight: 600;
+    }
+
+    .return-date {
+        margin-top: 15px;
+        padding: 10px 15px;
+        background: #e8f5e9;
+        color: #27ae60;
+        border-radius: 12px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .last-update {
+        margin-top: 10px;
+        font-size: 0.9em;
+        color: #999;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .back-button {
+        display: inline-block;
+        background: #ff6b35;
+        color: white;
+        padding: 12px 30px;
+        border-radius: 30px;
+        text-decoration: none;
+        font-weight: 600;
+        margin-top: 30px;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+    }
+
+        .back-button:hover {
+            background: white;
+            color: #ff6b35;
+            border-color: #ff6b35;
+            transform: translateX(-5px);
+        }
+
+        .back-button i {
+            margin-right: 8px;
+        }
+
+    .no-injuries {
+        text-align: center;
+        padding: 80px;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 20px;
+        color: #27ae60;
+    }
+
+        .no-injuries i {
+            font-size: 5em;
+            margin-bottom: 20px;
+        }
+
+        .no-injuries p {
+            font-size: 1.5em;
+            font-weight: 600;
+        }
+
+    .fallback-image {
+        width: 140px;
+        height: 140px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 3em;
+        font-weight: bold;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    }
+
+    details summary {
+        color: #ff6b35;
+        cursor: pointer;
+        font-size: 1em;
+        font-weight: 600;
+        padding: 8px 0;
+    }
+
+        details summary:hover {
+            color: #ff5420;
+        }
+
+    details p {
+        margin-top: 10px;
+        padding: 15px;
+        background: white;
+        border-radius: 10px;
+        font-size: 0.95em;
+        color: #666;
+        line-height: 1.5;
+        border: 1px solid #e0e0e0;
+    }
+
+    @@media (max-width: 768px) {
+        .team-header-content {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .team-name {
+            font-size: 2em;
+        }
+
+        .players-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .summary-stats {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="injuries-container">
+    <div class="team-header">
+        <div class="team-header-content">
+            <img src="@Model.TeamLogo" class="team-logo" alt="@Model.TeamName"
+                 onerror="this.onerror=null; this.src='https://a.espncdn.com/i/teamlogos/nba/500/default.png';">
+            <div class="team-title">
+                <h1 class="team-name">@(string.IsNullOrEmpty(Model.TeamName) ? Model.TeamAbbrev : Model.TeamName)</h1>
+                <div class="team-badges">
+                    <span class="badge" style="background: #@Model.TeamColor;">@Model.TeamAbbrev</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (Model.TotalInjuries > 0)
+    {
+        <div class="summary-stats">
+            <div class="stat-card">
+                <div class="stat-label">Травмировано</div>
+                <div class="stat-value">@Model.TotalInjuries</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Статус</div>
+                <div class="stat-value" style="font-size: 1.5em; color: #666;">
+                    @{
+                        int outCount = 0;
+                        int dayToDayCount = 0;
+                        foreach (var player in Model.InjuredPlayers)
+                        {
+                            if (player.Status == "Out") { outCount++; }
+                            if (player.Status == "Day-To-Day") { dayToDayCount++; }
+                        }
+                    }
+                    @outCount Out · @dayToDayCount Day-to-Day
+                </div>
+            </div>
+        </div>
+
+        <div class="players-grid">
+            @foreach (var player in Model.InjuredPlayers)
+            {
+                bool hasValidId = player.Id > 0;
+                @if (hasValidId)
+                {
+                    <a href="@Url.Action("PlayersPage", "PlayersPage", new { playerId = player.Id })" class="player-card clickable">
+                        <div class="player-header"></div>
+
+                        <div class="player-image-container">
+                            @if (!string.IsNullOrEmpty(player.HeadshotUrl) && !player.HeadshotUrl.Contains("0.png"))
+                            {
+                                <img src="@player.HeadshotUrl"
+                                     class="player-image"
+                                     alt="@player.DisplayName"
+                                     onerror="this.onerror=null; this.src='https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/0.png&w=200&h=200';">
+                            }
+                            else
+                            {
+                                <div class="fallback-image">
+                                    @{
+                                        string initials = "?";
+                                        if (!string.IsNullOrEmpty(player.DisplayName))
+                                        {
+                                            var nameParts = player.DisplayName.Split(' ');
+                                            if (nameParts.Length >= 2)
+                                            {
+                                                initials = nameParts[0].Substring(0, 1) + nameParts[1].Substring(0, 1);
+                                            }
+                                            else if (nameParts.Length == 1 && nameParts[0].Length > 0)
+                                            {
+                                                initials = nameParts[0].Substring(0, 1);
+                                            }
+                                        }
+                                    }
+                                    @initials
+                                </div>
+                            }
+                            <span class="injury-badge">
+                                <i class="fas fa-exclamation-triangle"></i> Травма
+                            </span>
+                        </div>
+
+                        <div class="player-info">
+                            <div class="player-name">@player.DisplayName</div>
+
+                            <div class="player-position">
+                                <span class="player-position-badge">
+                                    <i class="fas fa-basketball-ball" style="margin-right: 5px;"></i>
+                                    @(!string.IsNullOrEmpty(player.Position) ? player.Position : "-")
+                                </span>
+                            </div>
+
+                            <div class="injury-details">
+                                <div class="injury-type">
+                                    <i class="fas fa-medkit"></i> @(!string.IsNullOrEmpty(player.InjuryType) ? player.InjuryType : "Травма")
+                                </div>
+
+                                @if (!string.IsNullOrEmpty(player.ShortComment))
+                                {
+                                    <div class="injury-comment">
+                                        <i class="fas fa-quote-left" style="color: #e74c3c; opacity: 0.5; margin-right: 5px;"></i>
+                                        @player.ShortComment
+                                    </div>
+                                }
+
+                                <div class="status-badge">
+                                    <i class="fas fa-clock"></i> @player.Status
+                                </div>
+
+                                <div class="injury-meta">
+                                    @if (!string.IsNullOrEmpty(player.InjuryLocation))
+                                    {
+                                        <span><i class="fas fa-location-dot"></i> @player.InjuryLocation</span>
+                                    }
+                                    @if (!string.IsNullOrEmpty(player.Side))
+                                    {
+                                        <span><i class="fas fa-arrows-left-right"></i> @player.Side</span>
+                                    }
+                                    @if (!string.IsNullOrEmpty(player.InjuryDetail))
+                                    {
+                                        <span><i class="fas fa-info-circle"></i> @player.InjuryDetail</span>
+                                    }
+                                </div>
+
+                                @if (!string.IsNullOrEmpty(player.ReturnDate))
+                                {
+                                    <div class="return-date">
+                                        <i class="fas fa-calendar-check"></i> Ожидаемое возвращение: @player.ReturnDate
+                                    </div>
+                                }
+
+                                @if (!string.IsNullOrEmpty(player.LastUpdate))
+                                {
+                                    <div class="last-update">
+                                        <i class="fas fa-clock"></i> Обновлено: @player.LastUpdate
+                                    </div>
+                                }
+                            </div>
+
+                            @if (!string.IsNullOrEmpty(player.LongComment) && player.LongComment.Length > 100)
+                            {
+                                <details>
+                                    <summary>
+                                        <i class="fas fa-chevron-down"></i> Подробнее о травме
+                                    </summary>
+                                    <p>
+                                        @player.LongComment
+                                    </p>
+                                </details>
+                            }
+                        </div>
+                    </a>
+                }
+                else
+                {
+                    <div class="player-card">
+                        <div class="player-header"></div>
+
+                        <div class="player-image-container">
+                            @if (!string.IsNullOrEmpty(player.HeadshotUrl) && !player.HeadshotUrl.Contains("0.png"))
+                            {
+                                <img src="@player.HeadshotUrl"
+                                     class="player-image"
+                                     alt="@player.DisplayName"
+                                     onerror="this.onerror=null; this.src='https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/0.png&w=200&h=200';">
+                            }
+                            else
+                            {
+                                <div class="fallback-image">
+                                    @{
+                                        string initials = "?";
+                                        if (!string.IsNullOrEmpty(player.DisplayName))
+                                        {
+                                            var nameParts = player.DisplayName.Split(' ');
+                                            if (nameParts.Length >= 2)
+                                            {
+                                                initials = nameParts[0].Substring(0, 1) + nameParts[1].Substring(0, 1);
+                                            }
+                                            else if (nameParts.Length == 1 && nameParts[0].Length > 0)
+                                            {
+                                                initials = nameParts[0].Substring(0, 1);
+                                            }
+                                        }
+                                    }
+                                    @initials
+                                </div>
+                            }
+                            <span class="injury-badge">
+                                <i class="fas fa-exclamation-triangle"></i> Травма
+                            </span>
+                        </div>
+
+                        <div class="player-info">
+                            <div class="player-name">@player.DisplayName</div>
+
+                            <div class="player-position">
+                                <span class="player-position-badge">
+                                    <i class="fas fa-basketball-ball" style="margin-right: 5px;"></i>
+                                    @(!string.IsNullOrEmpty(player.Position) ? player.Position : "-")
+                                </span>
+                            </div>
+
+                            <div class="injury-details">
+                                <div class="injury-type">
+                                    <i class="fas fa-medkit"></i> @(!string.IsNullOrEmpty(player.InjuryType) ? player.InjuryType : "Травма")
+                                </div>
+
+                                @if (!string.IsNullOrEmpty(player.ShortComment))
+                                {
+                                    <div class="injury-comment">
+                                        <i class="fas fa-quote-left" style="color: #e74c3c; opacity: 0.5; margin-right: 5px;"></i>
+                                        @player.ShortComment
+                                    </div>
+                                }
+
+                                <div class="status-badge">
+                                    <i class="fas fa-clock"></i> @player.Status
+                                </div>
+
+                                <div class="injury-meta">
+                                    @if (!string.IsNullOrEmpty(player.InjuryLocation))
+                                    {
+                                        <span><i class="fas fa-location-dot"></i> @player.InjuryLocation</span>
+                                    }
+                                    @if (!string.IsNullOrEmpty(player.Side))
+                                    {
+                                        <span><i class="fas fa-arrows-left-right"></i> @player.Side</span>
+                                    }
+                                    @if (!string.IsNullOrEmpty(player.InjuryDetail))
+                                    {
+                                        <span><i class="fas fa-info-circle"></i> @player.InjuryDetail</span>
+                                    }
+                                </div>
+
+                                @if (!string.IsNullOrEmpty(player.ReturnDate))
+                                {
+                                    <div class="return-date">
+                                        <i class="fas fa-calendar-check"></i> Ожидаемое возвращение: @player.ReturnDate
+                                    </div>
+                                }
+
+                                @if (!string.IsNullOrEmpty(player.LastUpdate))
+                                {
+                                    <div class="last-update">
+                                        <i class="fas fa-clock"></i> Обновлено: @player.LastUpdate
+                                    </div>
+                                }
+                            </div>
+
+                            @if (!string.IsNullOrEmpty(player.LongComment) && player.LongComment.Length > 100)
+                            {
+                                <details>
+                                    <summary>
+                                        <i class="fas fa-chevron-down"></i> Подробнее о травме
+                                    </summary>
+                                    <p>
+                                        @player.LongComment
+                                    </p>
+                                </details>
+                            }
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    }
+    else
+    {
+        <div class="no-injuries">
+            <i class="fas fa-check-circle"></i>
+            <p>У команды нет травмированных игроков</p>
+        </div>
+    }
+
+    <div style="text-align: center; margin-top: 30px;">
+        <a href="javascript:history.back()" class="back-button">
+            <i class="fas fa-arrow-left"></i> Назад
+        </a>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const cards = document.querySelectorAll('.player-card');
+        cards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+                card.style.transition = 'all 0.5s ease';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, index * 100);
+        });
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const images = document.querySelectorAll('.player-image');
+        
+        images.forEach((img, index) => {
+            if (img.complete) {
+                checkImage(img, index);
+            } else {
+                img.onload = function() {
+                    checkImage(this, index);
+                };
+            }
+            
+            img.onerror = function() {
+                replaceWithBlack(this);
+            };
+        });
+        
+        function checkImage(img, index) {
+            try {
+                const canvas = document.createElement('canvas');
+                canvas.width = img.width || 140;
+                canvas.height = img.height || 140;
+                const ctx = canvas.getContext('2d', { willReadFrequently: true });
+                
+                try {
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    
+                    const points = [
+                        [Math.floor(canvas.width/2), Math.floor(canvas.height/2)],
+                        [10, 10],
+                        [canvas.width-10, 10],
+                        [10, canvas.height-10],
+                        [canvas.width-10, canvas.height-10]
+                    ];
+                    
+                    let transparentPixels = 0;
+                    
+                    for (let [x, y] of points) {
+                        const pixel = ctx.getImageData(x, y, 1, 1).data;
+                        if (pixel[3] === 0) {
+                            transparentPixels++;
+                        }
+                    }
+                    
+                    if (transparentPixels === points.length) {
+                        replaceWithBlack(img);
+                    }
+                    
+                } catch (e) {
+                    console.log(e);
+                }
+                
+            } catch (e) {
+                console.log(e);
+            }
+        }
+        
+        function replaceWithBlack(img) {
+            const parent = img.parentNode;
+            if (parent) {
+                const placeholder = document.createElement('div');
+                placeholder.className = img.className;
+                placeholder.style.width = img.offsetWidth + 'px';
+                placeholder.style.height = img.offsetHeight + 'px';
+                placeholder.style.backgroundColor = '#000000';
+                placeholder.style.borderRadius = window.getComputedStyle(img).borderRadius;
+                placeholder.style.margin = window.getComputedStyle(img).margin;
+                parent.replaceChild(placeholder, img);
+            }
+        }
+    });
+</script>

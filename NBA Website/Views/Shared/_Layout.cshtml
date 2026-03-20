@@ -1,0 +1,570 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - NBA Info</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <style>
+            .espn-header {
+                background: linear-gradient(135deg, #1a1a1a 0%, #2c2c2c 100%);
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                position: sticky;
+                top: 0;
+                z-index: 1000;
+            }
+
+            .espn-navbar {
+                padding: 0.8rem 1rem;
+            }
+
+            .espn-logo {
+                font-size: 1.8rem;
+                font-weight: 800;
+                color: #ff6b35 !important;
+                text-transform: uppercase;
+                letter-spacing: 2px;
+                text-decoration: none;
+                transition: all 0.3s ease;
+                display: flex;
+                align-items: center;
+            }
+
+                .espn-logo:hover {
+                    color: #ff8c5a !important;
+                    transform: scale(1.05);
+                    text-decoration: none;
+                }
+
+                .espn-logo i {
+                    font-size: 2.2rem;
+                    margin-right: 10px;
+                    color: #ff6b35;
+                }
+
+            .espn-nav {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 1.5rem;
+                margin: 0 auto;
+            }
+
+            .espn-nav-item {
+                position: relative;
+            }
+
+            .espn-nav-link {
+                color: #ffffff !important;
+                font-weight: 600;
+                font-size: 1.1rem;
+                padding: 0.5rem 1rem !important;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                transition: all 0.3s ease;
+                border-radius: 25px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                text-decoration: none;
+            }
+
+                .espn-nav-link i {
+                    font-size: 1.2rem;
+                    transition: transform 0.3s ease;
+                }
+
+                .espn-nav-link:hover {
+                    background: rgba(255, 107, 53, 0.2);
+                    color: #ff6b35 !important;
+                    transform: translateY(-2px);
+                    text-decoration: none;
+                }
+
+                    .espn-nav-link:hover i {
+                        transform: rotate(10deg);
+                    }
+
+                .espn-nav-link.active {
+                    background: #ff6b35;
+                    color: white !important;
+                    box-shadow: 0 4px 10px rgba(255, 107, 53, 0.3);
+                }
+
+                    .espn-nav-link.active i {
+                        color: white;
+                    }
+
+            .search-container {
+                position: relative;
+                margin-left: 20px;
+            }
+
+            .search-input {
+                padding: 8px 15px;
+                border-radius: 25px;
+                border: 1px solid #ddd;
+                width: 250px;
+                font-size: 0.9em;
+                background: white;
+            }
+
+                .search-input:focus {
+                    outline: none;
+                    border-color: #ff6b35;
+                    box-shadow: 0 0 0 2px rgba(255,107,53,0.2);
+                }
+
+            .search-results {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: white;
+                border: 1px solid #ddd;
+                border-radius: 10px;
+                max-height: 400px;
+                overflow-y: auto;
+                z-index: 1000;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            }
+
+            .search-result-item {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                padding: 10px 15px;
+                border-bottom: 1px solid #f0f0f0;
+                cursor: pointer;
+                transition: background-color 0.2s;
+            }
+
+                .search-result-item:hover {
+                    background-color: #fff5f0;
+                }
+
+                .search-result-item:last-child {
+                    border-bottom: none;
+                }
+
+            .search-result-image {
+                width: 30px;
+                height: 30px;
+                border-radius: 50%;
+                object-fit: cover;
+            }
+
+            .search-result-info {
+                flex: 1;
+            }
+
+            .search-result-name {
+                font-weight: 600;
+                color: #333;
+            }
+
+            .search-result-meta {
+                font-size: 0.8em;
+                color: #999;
+                display: flex;
+                gap: 10px;
+            }
+
+            .search-result-team {
+                background: #f0f0f0;
+                padding: 2px 8px;
+                border-radius: 12px;
+            }
+
+            .search-loading {
+                padding: 15px;
+                text-align: center;
+                color: #999;
+            }
+
+            .search-no-results {
+                padding: 15px;
+                text-align: center;
+                color: #999;
+            }
+
+            .main-content {
+                min-height: calc(100vh - 80px);
+                padding: 2rem 0;
+            }
+
+            .espn-footer {
+                background: linear-gradient(135deg, #1a1a1a 0%, #2c2c2c 100%);
+                padding: 25px 0;
+                box-shadow: 0 -4px 12px rgba(0,0,0,0.15);
+                margin-top: auto;
+            }
+
+            .footer-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: 0 20px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .footer-buttons {
+                display: flex;
+                gap: 20px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .footer-btn {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                padding: 12px 30px;
+                border-radius: 30px;
+                font-weight: 600;
+                font-size: 1em;
+                text-decoration: none;
+                transition: all 0.3s ease;
+                border: 2px solid transparent;
+                cursor: pointer;
+                background: #ff6b35;
+                color: white;
+                min-width: 220px;
+            }
+
+                .footer-btn:hover {
+                    background: white;
+                    color: #ff6b35;
+                    border-color: #ff6b35;
+                    transform: translateY(-2px);
+                    box-shadow: 0 5px 15px rgba(255,107,53,0.3);
+                }
+
+                .footer-btn i {
+                    font-size: 1.1em;
+                    transition: transform 0.3s ease;
+                }
+
+                .footer-btn:hover i {
+                    transform: scale(1.1);
+                }
+
+                .footer-btn.feedback {
+                    background: #1d428a;
+                }
+
+                    .footer-btn.feedback:hover {
+                        background: white;
+                        color: #1d428a;
+                        border-color: #1d428a;
+                        box-shadow: 0 5px 15px rgba(29,66,138,0.3);
+                    }
+
+            .footer-copyright {
+                color: #999;
+                font-size: 0.9em;
+                margin-top: 5px;
+            }
+
+                .footer-copyright i {
+                    color: #ff6b35;
+                    margin: 0 3px;
+                }
+
+            body {
+                display: flex;
+                flex-direction: column;
+                min-height: 100vh;
+                margin: 0;
+            }
+
+            .main-content {
+                flex: 1;
+            }
+
+            @@media (max-width: 768px) {
+                .footer-buttons {
+                    flex-direction: column;
+                    gap: 15px;
+                    width: 100%;
+                }
+            
+                .footer-btn {
+                    width: 100%;
+                    min-width: auto;
+                }
+            }
+    </style>
+</head>
+<body>
+    <header class="espn-header">
+        <nav class="espn-navbar container">
+            <div class="d-flex align-items-center justify-content-between w-100">
+                <div class="espn-nav">
+                    <div class="espn-nav-item">
+                        <a href="/" class="espn-nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Home" && ViewContext.RouteData.Values["action"]?.ToString() == "Index" ? "active" : "")">
+                            <i class="fas fa-home"></i>
+                            Главная
+                        </a>
+                    </div>
+
+                    <div class="espn-nav-item">
+                        <a href="/NBA/Teams" class="espn-nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "NBA" && ViewContext.RouteData.Values["action"]?.ToString() == "Teams" ? "active" : "")">
+                            <i class="fas fa-users"></i>
+                            Команды
+                        </a>
+                    </div>
+
+                    <div class="espn-nav-item">
+                        <a href="/NBA/Standings" class="espn-nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "NBA" && ViewContext.RouteData.Values["action"]?.ToString() == "Standings" ? "active" : "")">
+                            <i class="fas fa-table"></i>
+                            Турнирная таблица
+                        </a>
+                    </div>
+
+                    <div class="espn-nav-item">
+                        <a href="/Calendar/Calendar" class="espn-nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Calendar" ? "active" : "")">
+                            <i class="fas fa-calendar-alt"></i>
+                            Расписание
+                        </a>
+                    </div>
+
+                    <div class="espn-nav-item">
+                        <a href="/Leaders/Leaders" class="espn-nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Leaders" ? "active" : "")">
+                            <i class="fas fa-chart-line"></i>
+                            Статистика
+                        </a>
+                    </div>
+                </div>
+
+                <div class="search-container">
+                    <input type="text"
+                           id="player-search"
+                           class="search-input"
+                           placeholder="Поиск игроков..."
+                           autocomplete="off">
+                    <div id="search-results" class="search-results"></div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="main-content">
+        <div class="container">
+            @RenderBody()
+        </div>
+    </div>
+
+    <footer class="espn-footer">
+        <div class="footer-container">
+            <div class="footer-buttons">
+                <a href="https://drive.google.com/file/d/1cnBTLEbYdL2-8RPpjIRFAWkyLeyhWgAp/view?usp=sharing"
+                       class="footer-btn"
+                       target="_blank"
+                       rel="noopener noreferrer">
+                    <i class="fas fa-book-open"></i>
+                    Руководство пользователя
+                </a>
+            
+                <a href="https://forms.gle/9L9oCjpj2M3iqtMd9"
+                       class="footer-btn feedback"
+                       target="_blank"
+                       rel="noopener noreferrer">
+                    <i class="fas fa-comment"></i>
+                    Обратная связь
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    
+    <script>
+            let searchTimeout;
+            let isLoading = false;
+            const searchInput = document.getElementById('player-search');
+            const searchResults = document.getElementById('search-results');
+
+            if (searchInput) {
+                searchInput.addEventListener('click', checkAndStartLoading);
+                searchInput.addEventListener('focus', checkAndStartLoading);
+
+                searchInput.addEventListener('input', function() {
+                    clearTimeout(searchTimeout);
+                    const query = this.value.trim();
+
+                    if (searchInput.disabled) return;
+                    if (query.length < 2) {
+                        searchResults.style.display = 'none';
+                        return;
+                    }
+
+                    searchTimeout = setTimeout(() => performSearch(query), 300);
+                });
+
+                document.addEventListener('click', function(e) {
+                    if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+                        searchResults.style.display = 'none';
+                    }
+                });
+            }
+
+            function checkAndStartLoading() {
+                fetch('/api/search/status')
+                    .then(response => response.json())
+                    .then(status => {
+                        if (status.count > 0 && !status.loading) {
+                            unlockSearchInput();
+                        } else {
+                            startLoading();
+                        }
+                    })
+                    .catch(() => startLoading());
+            }
+
+            function startLoading() {
+                if (searchInput.disabled) return;
+
+                isLoading = true;
+                searchInput.disabled = true;
+                searchInput.placeholder = 'Загрузка базы игроков...';
+                searchResults.innerHTML = '<div class="search-loading"><i class="fas fa-spinner fa-spin"></i> Загрузка базы игроков...</div>';
+                searchResults.style.display = 'block';
+
+                fetch('/api/search/load')
+                    .then(response => response.json())
+                    .then(() => checkLoadingStatus())
+                    .catch(() => {
+                        searchResults.innerHTML = '<div class="search-no-results">Ошибка загрузки</div>';
+                        unlockSearchInput();
+                    });
+            }
+
+            function checkLoadingStatus() {
+                fetch('/api/search/status')
+                    .then(response => response.json())
+                    .then(status => {
+                        if (status.loading) {
+                            searchResults.innerHTML = `<div class="search-loading"><i class="fas fa-spinner fa-spin"></i> Загрузка игроков: ${status.count}/~1000</div>`;
+                            setTimeout(checkLoadingStatus, 1000);
+                        } else {
+                            unlockSearchInput();
+                            const query = searchInput.value.trim();
+                            if (query.length >= 2) performSearch(query);
+                            else searchResults.style.display = 'none';
+                        }
+                    })
+                    .catch(() => unlockSearchInput());
+            }
+
+            function unlockSearchInput() {
+                searchInput.disabled = false;
+                searchInput.placeholder = 'Поиск игроков...';
+                isLoading = false;
+            }
+
+            function performSearch(query) {
+                if (searchInput.disabled) return;
+
+                searchResults.innerHTML = '<div class="search-loading"><i class="fas fa-spinner fa-spin"></i> Поиск...</div>';
+                searchResults.style.display = 'block';
+
+                fetch(`/api/search/players?query=${encodeURIComponent(query)}`)
+                    .then(response => response.json())
+                    .then(players => {
+                        if (players.length === 0) {
+                            searchResults.innerHTML = '<div class="search-no-results">Игроки не найдены</div>';
+                            return;
+                        }
+
+                        let html = '';
+                        players.forEach(player => {
+                            const headshotUrl = player.headshotUrl || 'https://a.espncdn.com/i/headshots/nba/players/full/0.png';
+                            const teamAbbrev = player.teamAbbrev || '';
+                            const position = player.position || '';
+
+                            html += `
+                                <div class="search-result-item" onclick="window.location.href='/Players/${player.id}'">
+                                    <img src="${headshotUrl}" class="search-result-image" alt="${player.name}">
+                                    <div class="search-result-info">
+                                        <div class="search-result-name">${player.name}</div>
+                                        <div class="search-result-meta">
+                                            ${teamAbbrev ? `<span class="search-result-team">${teamAbbrev}</span>` : ''}
+                                            ${position ? `<span>${position}</span>` : ''}
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        });
+
+                        searchResults.innerHTML = html;
+                        setTimeout(checkSearchImages, 100);
+                    })
+                    .catch(() => {
+                        searchResults.innerHTML = '<div class="search-no-results">Ошибка при поиске</div>';
+                    });
+            }
+
+            function checkSearchImages() {
+                document.querySelectorAll('.search-result-image').forEach((img, index) => {
+                    const width = img.offsetWidth;
+                    const height = img.offsetHeight;
+
+                    if (img.complete) checkImage(img, width, height);
+                    else img.onload = () => checkImage(img, width, height);
+            
+                    img.onerror = () => replaceWithBlack(img, width, height);
+                });
+            }
+
+            function checkImage(img, width, height) {
+                try {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width || 30;
+                    canvas.height = img.height || 30;
+                    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+                    const points = [
+                        [Math.floor(canvas.width/2), Math.floor(canvas.height/2)],
+                        [5, 5], [canvas.width-5, 5],
+                        [5, canvas.height-5], [canvas.width-5, canvas.height-5]
+                    ];
+
+                    let transparentPixels = 0;
+                    for (let [x, y] of points) {
+                        if (ctx.getImageData(x, y, 1, 1).data[3] === 0) transparentPixels++;
+                    }
+
+                    if (transparentPixels === points.length) replaceWithBlack(img, width, height);
+                } catch {}
+            }
+
+            function replaceWithBlack(img, width, height) {
+                const parent = img.parentNode;
+                if (!parent) return;
+
+                const placeholder = document.createElement('div');
+                placeholder.className = img.className;
+                placeholder.style.width = width + 'px';
+                placeholder.style.height = height + 'px';
+                placeholder.style.backgroundColor = '#000000';
+                placeholder.style.borderRadius = window.getComputedStyle(img).borderRadius;
+                parent.replaceChild(placeholder, img);
+            }
+    </script>
+    
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

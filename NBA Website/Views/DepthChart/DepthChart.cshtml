@@ -1,0 +1,557 @@
+﻿@model NBA_Website.Models.DepthChartViewModel
+
+@{
+    ViewData["Title"] = $"Глубина состава {Model.TeamName}";
+}
+
+<style>
+    .depth-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 30px 20px;
+    }
+
+    .team-header {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 20px;
+        padding: 40px;
+        margin-bottom: 30px;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid #e0e0e0;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+
+        .team-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 8px;
+            background: linear-gradient(90deg, # @Model.TeamColor 0%, # @Model.TeamColor 100%);
+        }
+
+    .team-header-content {
+        display: flex;
+        align-items: center;
+        gap: 40px;
+        flex-wrap: wrap;
+    }
+
+    .team-logo {
+        width: 150px;
+        height: 150px;
+        object-fit: contain;
+        filter: drop-shadow(0 10px 20px rgba(0,0,0,0.2));
+        background: white;
+        border-radius: 50%;
+        padding: 20px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .team-title {
+        flex: 1;
+    }
+
+    .team-name {
+        font-size: 2.5em;
+        font-weight: 800;
+        color: #1a1a1a;
+        margin-bottom: 10px;
+        letter-spacing: -0.02em;
+    }
+
+    .team-location {
+        font-size: 1.2em;
+        color: #666;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .team-location i {
+            color: #ff6b35;
+        }
+
+    .team-badge {
+        background: #ff6b35;
+        color: white;
+        padding: 8px 20px;
+        border-radius: 25px;
+        font-size: 1em;
+        font-weight: 600;
+        text-transform: uppercase;
+        display: inline-block;
+    }
+
+    .lineups-section {
+        margin-bottom: 40px;
+    }
+
+    .section-title {
+        font-size: 1.5em;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid # @Model.TeamColor;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+        .section-title i {
+            color: # @Model.TeamColor;
+        }
+
+    .lineups-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 25px;
+        margin-bottom: 40px;
+    }
+
+    .lineup-card {
+        background: white;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        border: 1px solid #e0e0e0;
+        transition: transform 0.3s ease;
+    }
+
+        .lineup-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+        }
+
+    .lineup-header {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        padding: 15px 20px;
+        border-bottom: 2px solid # @Model.TeamColor;
+    }
+
+    .lineup-name {
+        font-size: 1.2em;
+        font-weight: 700;
+        color: #333;
+    }
+
+    .lineup-players {
+        padding: 15px;
+    }
+
+    .lineup-player {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 10px;
+        border-bottom: 1px solid #f0f0f0;
+        text-decoration: none;
+        color: inherit;
+        transition: background-color 0.2s ease;
+    }
+
+        .lineup-player:last-child {
+            border-bottom: none;
+        }
+
+        .lineup-player:hover {
+            background-color: #fff5f0;
+        }
+
+            .lineup-player:hover .player-name-small {
+                color: #ff6b35;
+            }
+
+    .player-position-badge {
+        width: 40px;
+        height: 40px;
+        background: # @Model.TeamColor;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 1.1em;
+    }
+
+    .player-info-small {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .player-image-small {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+        transition: transform 0.2s ease;
+    }
+
+    .lineup-player:hover .player-image-small {
+        transform: scale(1.1);
+    }
+
+    .player-name-small {
+        font-weight: 600;
+        color: #333;
+        transition: color 0.2s ease;
+    }
+
+    .injury-indicator-small {
+        display: inline-flex;
+        align-items: center;
+        gap: 2px;
+        background: #e74c3c;
+        color: white;
+        padding: 2px 6px;
+        border-radius: 10px;
+        font-size: 0.7em;
+        margin-left: 5px;
+    }
+
+    .depth-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-top: 30px;
+    }
+
+    .position-card {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        border: 1px solid #e0e0e0;
+    }
+
+    .position-header {
+        background: #f8f9fa;
+        padding: 12px 15px;
+        border-bottom: 2px solid # @Model.TeamColor;
+    }
+
+    .position-name {
+        font-weight: 600;
+        color: #333;
+    }
+
+    .position-abbr {
+        font-size: 0.85em;
+        color: #999;
+        margin-left: 5px;
+    }
+
+    .athletes-list {
+        padding: 10px;
+    }
+
+    .athlete-item-small {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px;
+        border-bottom: 1px solid #f0f0f0;
+        text-decoration: none;
+        color: inherit;
+        transition: background-color 0.2s ease;
+    }
+
+        .athlete-item-small:last-child {
+            border-bottom: none;
+        }
+
+        .athlete-item-small:hover {
+            background-color: #fff5f0;
+        }
+
+            .athlete-item-small:hover .player-name-small {
+                color: #ff6b35;
+            }
+
+    .athlete-order-small {
+        width: 24px;
+        height: 24px;
+        background: #f0f0f0;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8em;
+        font-weight: 600;
+        color: #666;
+    }
+
+        .athlete-order-small.starter {
+            background: #ff6b35;
+            color: white;
+        }
+
+    .back-button {
+        display: inline-block;
+        background: #ff6b35;
+        color: white;
+        padding: 12px 30px;
+        border-radius: 30px;
+        text-decoration: none;
+        font-weight: 600;
+        margin-top: 30px;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+    }
+
+        .back-button:hover {
+            background: white;
+            color: #ff6b35;
+            border-color: #ff6b35;
+            transform: translateX(-5px);
+        }
+
+        .back-button i {
+            margin-right: 8px;
+        }
+
+    .no-data {
+        text-align: center;
+        padding: 80px;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 20px;
+        color: #666;
+    }
+
+        .no-data i {
+            font-size: 5em;
+            color: #ccc;
+            margin-bottom: 20px;
+        }
+
+        .no-data p {
+            font-size: 1.5em;
+            font-weight: 600;
+        }
+
+    @@media (max-width: 768px) {
+        .team-header-content {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .team-name {
+            font-size: 2em;
+        }
+    }
+</style>
+
+<div class="depth-container">
+    <div class="team-header">
+        <div class="team-header-content">
+            <img src="@Model.TeamLogo" class="team-logo" alt="@Model.TeamName"
+                 onerror="this.onerror=null; this.src='https://a.espncdn.com/i/teamlogos/nba/500/default.png';">
+            <div class="team-title">
+                <h1 class="team-name">@(string.IsNullOrEmpty(Model.TeamName) ? Model.TeamAbbrev : Model.TeamName)</h1>
+                <div class="team-location">
+                    <i class="fas fa-map-marker-alt"></i> @Model.Location
+                </div>
+                <span class="team-badge">@Model.TeamAbbrev</span>
+            </div>
+        </div>
+    </div>
+
+    @if (Model.PossibleLineups.Any())
+    {
+        <div class="lineups-section">
+            <div class="lineups-grid">
+                @foreach (var lineup in Model.PossibleLineups)
+                {
+                    <div class="lineup-card">
+                        <div class="lineup-header">
+                            <span class="lineup-name">@lineup.Name</span>
+                        </div>
+                        <div class="lineup-players">
+                            @foreach (var player in lineup.Players)
+                            {
+                                <a href="@Url.Action("PlayersPage", "PlayersPage", new { playerId = player.Player.Id })" class="lineup-player">
+                                    <div class="player-position-badge">@player.Position</div>
+                                    <div class="player-info-small">
+                                        <img src="@player.Player.HeadshotUrl"
+                                             class="player-image-small"
+                                             alt="@player.Player.DisplayName"
+                                             onerror="this.onerror=null; this.src='https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/0.png&w=200&h=200';">
+                                        <span class="player-name-small">
+                                            @player.Player.DisplayName
+                                            @if (player.Player.IsInjured)
+                                            {
+                                                <span class="injury-indicator-small">
+                                                    <i class="fas fa-exclamation-triangle"></i>
+                                                </span>
+                                            }
+                                        </span>
+                                    </div>
+                                </a>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <h3 class="section-title">
+            <i class="fas fa-layer-group"></i> Глубина по позициям
+        </h3>
+        <div class="depth-grid">
+            @foreach (var position in Model.DepthChart.OrderBy(p => GetPositionOrder(p.Key)))
+            {
+                <div class="position-card">
+                    <div class="position-header">
+                        <span class="position-name">@position.Value.PositionDisplayName</span>
+                        <span class="position-abbr">@position.Value.PositionAbbreviation</span>
+                    </div>
+                    <div class="athletes-list">
+                        @foreach (var athlete in position.Value.Athletes.Take(5))
+                        {
+                            <a href="@Url.Action("PlayersPage", "PlayersPage", new { playerId = athlete.Id })" class="athlete-item-small">
+                                <div class="athlete-order-small @(athlete.Order == 1 ? "starter" : "")">@athlete.Order</div>
+                                <img src="@athlete.HeadshotUrl"
+                                     class="player-image-small"
+                                     alt="@athlete.DisplayName"
+                                     onerror="this.onerror=null; this.src='https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/0.png&w=200&h=200';">
+                                <span class="player-name-small">
+                                    @athlete.DisplayName
+                                    @if (athlete.IsInjured)
+                                    {
+                                        <span class="injury-indicator-small">
+                                            <i class="fas fa-exclamation-triangle"></i>
+                                        </span>
+                                    }
+                                </span>
+                            </a>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="no-data">
+            <i class="fas fa-users-slash"></i>
+            <p>Информация о глубине состава временно недоступна</p>
+        </div>
+    }
+
+    <div style="text-align: center; margin-top: 30px;">
+        <a href="javascript:history.back()" class="back-button">
+            <i class="fas fa-arrow-left"></i> Назад
+        </a>
+    </div>
+</div>
+
+@functions {
+    private int GetPositionOrder(string positionKey)
+    {
+        return positionKey.ToLower() switch
+        {
+            "pg" => 1,
+            "sg" => 2,
+            "sf" => 3,
+            "pf" => 4,
+            "c" => 5,
+            _ => 99
+        };
+    }
+}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const cards = document.querySelectorAll('.lineup-card, .position-card');
+        cards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+                card.style.transition = 'all 0.5s ease';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, index * 100);
+        });
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const images = document.querySelectorAll('.player-image-small');
+        
+        images.forEach((img, index) => {
+            if (img.complete) {
+                checkImage(img, index);
+            } else {
+                img.onload = function() {
+                    checkImage(this, index);
+                };
+            }
+            
+            img.onerror = function() {
+                replaceWithBlack(this);
+            };
+        });
+        
+        function checkImage(img, index) {
+            try {
+                const canvas = document.createElement('canvas');
+                canvas.width = img.width || 40;
+                canvas.height = img.height || 40;
+                const ctx = canvas.getContext('2d', { willReadFrequently: true });
+                
+                try {
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    
+                    const points = [
+                        [Math.floor(canvas.width/2), Math.floor(canvas.height/2)],
+                        [5, 5],
+                        [canvas.width-5, 5],
+                        [5, canvas.height-5],
+                        [canvas.width-5, canvas.height-5]
+                    ];
+                    
+                    let transparentPixels = 0;
+                    
+                    for (let [x, y] of points) {
+                        const pixel = ctx.getImageData(x, y, 1, 1).data;
+                        if (pixel[3] === 0) {
+                            transparentPixels++;
+                        }
+                    }
+                    
+                    if (transparentPixels === points.length) {
+                        replaceWithBlack(img);
+                    }
+                    
+                } catch (e) {
+                    console.log(e);
+                }
+                
+            } catch (e) {
+                console.log(e);
+            }
+        }
+        
+        function replaceWithBlack(img) {
+            const parent = img.parentNode;
+            if (parent) {
+                const placeholder = document.createElement('div');
+                placeholder.className = img.className;
+                placeholder.style.width = img.offsetWidth + 'px';
+                placeholder.style.height = img.offsetHeight + 'px';
+                placeholder.style.backgroundColor = '#000000';
+                placeholder.style.borderRadius = window.getComputedStyle(img).borderRadius;
+                placeholder.style.margin = window.getComputedStyle(img).margin;
+                parent.replaceChild(placeholder, img);
+            }
+        }
+    });
+</script>

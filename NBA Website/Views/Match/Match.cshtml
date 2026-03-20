@@ -1,0 +1,1169 @@
+﻿@model NBA_Website.Models.MatchViewModel
+
+@{
+    ViewData["Title"] = $"{Model.AwayTeam.ShortDisplayName} @ {Model.HomeTeam.ShortDisplayName}";
+}
+
+<style>
+    .match-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 30px 20px;
+    }
+
+    .match-header {
+        background: linear-gradient(135deg, #1a1a1a 0%, #2c2c2c 100%);
+        border-radius: 20px;
+        padding: 40px;
+        margin-bottom: 30px;
+        color: white;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+        .match-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 8px;
+            background: linear-gradient(90deg, #ff6b35 0%, #ff8c5a 100%);
+        }
+
+    .match-teams {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+
+    .team-header {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        flex: 1;
+        min-width: 280px;
+        text-decoration: none;
+        color: white;
+        transition: transform 0.2s ease;
+    }
+
+        .team-header:hover {
+            transform: scale(1.02);
+        }
+
+            .team-header:hover .team-name-large {
+                color: #ff6b35;
+            }
+
+        .team-header.away {
+            justify-content: flex-end;
+        }
+
+    .team-logo-large {
+        width: 100px;
+        height: 100px;
+        object-fit: contain;
+        filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3));
+        transition: transform 0.2s ease;
+    }
+
+    .team-header:hover .team-logo-large {
+        transform: scale(1.1);
+    }
+
+    .team-info-large {
+        text-align: left;
+    }
+
+    .team-header.away .team-info-large {
+        text-align: right;
+    }
+
+    .team-name-large {
+        font-size: 2.2em;
+        font-weight: 800;
+        margin-bottom: 5px;
+        line-height: 1.2;
+        color: white;
+        transition: color 0.2s ease;
+    }
+
+    .team-fullname-large {
+        font-size: 1.1em;
+        color: #ccc;
+        margin-bottom: 3px;
+        transition: color 0.2s ease;
+    }
+
+    .team-header:hover .team-fullname-large {
+        color: #ff8c5a;
+    }
+
+    .team-location-large {
+        font-size: 0.95em;
+        color: #999;
+        transition: color 0.2s ease;
+    }
+
+    .team-header:hover .team-location-large {
+        color: #ffa07a;
+    }
+
+    .match-score-large {
+        font-size: 3.5em;
+        font-weight: 800;
+        padding: 0 20px;
+        min-width: 180px;
+        text-align: center;
+        color: white;
+    }
+
+        .match-score-large .winner {
+            color: #27ae60;
+        }
+
+        .match-score-large .loser {
+            color: #e74c3c;
+        }
+
+        .match-score-large .vs {
+            color: #ff6b35;
+        }
+
+    .match-info {
+        display: flex;
+        gap: 20px;
+        margin-top: 30px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .info-card {
+        background: rgba(255,255,255,0.1);
+        border-radius: 15px;
+        padding: 15px 25px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.2);
+    }
+
+        .info-card i {
+            color: #ff6b35;
+            font-size: 1.2em;
+        }
+
+        .info-card span {
+            color: white;
+            font-size: 1em;
+        }
+
+    .arena-section {
+        margin-top: 25px;
+        display: flex;
+        justify-content: center;
+    }
+
+    .arena-info {
+        background: rgba(255,107,53,0.15);
+        padding: 15px 30px;
+        border-radius: 50px;
+        border: 1px solid rgba(255,107,53,0.3);
+        backdrop-filter: blur(5px);
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 1.1em;
+    }
+
+        .arena-info i {
+            color: #ff6b35;
+            font-size: 1.2em;
+        }
+
+    .arena-name {
+        color: white;
+        font-weight: 500;
+    }
+
+    .arena-home {
+        color: #ff6b35;
+        font-weight: 700;
+        margin-left: 5px;
+    }
+
+        .arena-home i {
+            margin-right: 5px;
+        }
+
+    .leaders-section {
+        margin: 30px 0;
+    }
+
+    .leaders-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+    }
+
+    .leaders-team {
+        background: white;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        border: 1px solid #e0e0e0;
+    }
+
+    .leaders-header {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        padding: 20px;
+        border-bottom: 2px solid #ff6b35;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .leaders-header-logo {
+        width: 40px;
+        height: 40px;
+        object-fit: contain;
+    }
+
+    .leaders-header-info h3 {
+        font-size: 1.2em;
+        font-weight: 700;
+        color: #333;
+        margin: 0;
+    }
+
+    .leaders-stats {
+        padding: 20px;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+    }
+
+    .leader-card {
+        text-align: center;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 12px;
+        transition: transform 0.2s ease;
+    }
+
+        .leader-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0,0,0,0.05);
+        }
+
+    .leader-category {
+        font-size: 0.85em;
+        color: #999;
+        text-transform: uppercase;
+        margin-bottom: 5px;
+    }
+
+    .leader-name {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 3px;
+        font-size: 1em;
+        text-decoration: none;
+        transition: color 0.2s ease;
+    }
+
+        .leader-name:hover {
+            color: #ff6b35;
+            text-decoration: underline;
+        }
+
+    .leader-value {
+        font-size: 1.3em;
+        font-weight: 700;
+        color: #ff6b35;
+    }
+
+    .team-stats {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+        margin: 30px 0;
+    }
+
+    .stat-section {
+        background: white;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        border: 1px solid #e0e0e0;
+    }
+
+    .stat-header {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        padding: 20px;
+        border-bottom: 2px solid #ff6b35;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .stat-header-logo {
+        width: 50px;
+        height: 50px;
+        object-fit: contain;
+    }
+
+    .stat-header-info {
+        flex: 1;
+    }
+
+        .stat-header-info h3 {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #333;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .stat-header-info .team-full-name {
+            font-size: 0.9em;
+            color: #999;
+            font-weight: 400;
+        }
+
+        .stat-header-info .score {
+            font-size: 1.8em;
+            font-weight: 800;
+            color: #ff6b35;
+            margin-top: 5px;
+        }
+
+    .stat-grid {
+        padding: 20px;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+
+    .stat-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        background: #f8f9fa;
+        border-radius: 10px;
+    }
+
+    .stat-label {
+        color: #666;
+        font-size: 0.95em;
+    }
+
+    .stat-value {
+        font-weight: 700;
+        color: #333;
+        font-size: 1.1em;
+    }
+
+    .players-section {
+        background: white;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        border: 1px solid #e0e0e0;
+        margin-top: 30px;
+    }
+
+    .players-tabs {
+        display: flex;
+        border-bottom: 2px solid #f0f0f0;
+    }
+
+    .tab-btn {
+        flex: 1;
+        padding: 15px;
+        background: none;
+        border: none;
+        font-size: 1.1em;
+        font-weight: 600;
+        color: #666;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+
+        .tab-btn.active {
+            color: #ff6b35;
+            border-bottom: 3px solid #ff6b35;
+            background: #fff5f0;
+        }
+
+        .tab-btn:hover {
+            background: #f8f9fa;
+        }
+
+    .players-table {
+        padding: 20px;
+        overflow-x: auto;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th {
+        text-align: left;
+        padding: 12px 8px;
+        background: #f8f9fa;
+        color: #666;
+        font-weight: 600;
+        font-size: 0.9em;
+        border-bottom: 2px solid #ff6b35;
+    }
+
+    td {
+        padding: 10px 8px;
+        border-bottom: 1px solid #f0f0f0;
+        color: #333;
+    }
+
+    .player-cell {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .player-headshot {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        object-fit: cover;
+        transition: transform 0.2s ease;
+    }
+
+    .player-headshot-link {
+        display: inline-block;
+        transition: transform 0.2s ease;
+    }
+
+        .player-headshot-link:hover {
+            transform: scale(1.1);
+        }
+
+    .player-name-link {
+        font-weight: 600;
+        color: #333;
+        text-decoration: none;
+        transition: color 0.2s ease;
+    }
+
+        .player-name-link:hover {
+            color: #ff6b35;
+            text-decoration: underline;
+        }
+
+    .player-jersey {
+        color: #999;
+        font-size: 0.85em;
+        margin-left: 5px;
+    }
+
+    .starter-badge {
+        background: #ff6b35;
+        color: white;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 0.75em;
+        font-weight: 600;
+        margin-left: 8px;
+    }
+
+    .dnp-row {
+        background-color: #fff1f0;
+    }
+
+        .dnp-row td {
+            color: #999;
+        }
+
+    .dnp-badge {
+        background: #e74c3c;
+        color: white;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 0.75em;
+        font-weight: 600;
+        margin-left: 8px;
+    }
+
+    .back-button {
+        display: inline-block;
+        background: #ff6b35;
+        color: white;
+        padding: 12px 30px;
+        border-radius: 30px;
+        text-decoration: none;
+        font-weight: 600;
+        margin-top: 30px;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+    }
+
+        .back-button:hover {
+            background: white;
+            color: #ff6b35;
+            border-color: #ff6b35;
+            transform: translateX(-5px);
+        }
+
+        .back-button i {
+            margin-right: 8px;
+        }
+
+    .no-games {
+        text-align: center;
+        padding: 80px;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 20px;
+        color: #666;
+    }
+
+        .no-games i {
+            font-size: 5em;
+            color: #ccc;
+            margin-bottom: 20px;
+        }
+
+        .no-games p {
+            font-size: 1.5em;
+            font-weight: 600;
+        }
+
+    .text-center {
+        text-align: center;
+    }
+
+    .dnp-text {
+        color: #e74c3c;
+        font-weight: 600;
+    }
+
+    @@media (max-width: 992px) {
+        .match-teams {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .team-header {
+            width: 100%;
+            justify-content: center;
+        }
+
+            .team-header.away {
+                justify-content: center;
+            }
+
+        .team-info-large {
+            text-align: left !important;
+        }
+
+        .team-header.away .team-info-large {
+            text-align: right !important;
+        }
+
+        .match-score-large {
+            padding: 15px 0;
+        }
+
+        .team-stats {
+            grid-template-columns: 1fr;
+        }
+
+        .stat-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .leaders-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .leaders-stats {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .team-name-large {
+            font-size: 1.8em;
+        }
+
+        .team-fullname-large {
+            font-size: 0.95em;
+        }
+
+        .team-logo-large {
+            width: 70px;
+            height: 70px;
+        }
+
+        .match-score-large {
+            font-size: 2.5em;
+        }
+
+        .match-header {
+            padding: 25px;
+        }
+
+        .arena-info {
+            flex-wrap: wrap;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .leaders-stats {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="match-container">
+    <div class="match-header">
+        <div class="match-teams">
+            <a href="@Url.Action("TeamDetails", "Team", new { abbrev = Model.AwayTeam.Abbreviation })" class="team-header away">
+                <div class="team-info-large">
+                    <div class="team-name-large">@Model.AwayTeam.ShortDisplayName</div>
+                    <div class="team-fullname-large">@Model.AwayTeam.DisplayName</div>
+                    <div class="team-location-large">@Model.AwayTeam.Location</div>
+                </div>
+                <img src="@Model.AwayTeam.Logo" class="team-logo-large" alt="@Model.AwayTeam.Abbreviation"
+                     onerror="this.onerror=null; this.src='https://a.espncdn.com/i/teamlogos/nba/500/default.png';">
+            </a>
+
+            <div class="match-score-large">
+                @if (Model.IsGamePlayed)
+                {
+                    <span class="@(Model.AwayTeam.IsWinner ? "winner" : "loser")">@Model.AwayTeam.Score</span>
+                    <span> - </span>
+                    <span class="@(Model.HomeTeam.IsWinner ? "winner" : "loser")">@Model.HomeTeam.Score</span>
+                }
+                else
+                {
+                    <span class="vs">VS</span>
+                }
+            </div>
+
+            <a href="@Url.Action("TeamDetails", "Team", new { abbrev = Model.HomeTeam.Abbreviation })" class="team-header home">
+                <img src="@Model.HomeTeam.Logo" class="team-logo-large" alt="@Model.HomeTeam.Abbreviation"
+                     onerror="this.onerror=null; this.src='https://a.espncdn.com/i/teamlogos/nba/500/default.png';">
+                <div class="team-info-large">
+                    <div class="team-name-large">@Model.HomeTeam.ShortDisplayName</div>
+                    <div class="team-fullname-large">@Model.HomeTeam.DisplayName</div>
+                    <div class="team-location-large">@Model.HomeTeam.Location</div>
+                </div>
+            </a>
+        </div>
+
+        <div class="match-info">
+            <div class="info-card">
+                <i class="fas fa-calendar-alt"></i>
+                <span>@Model.Date.ToString("dd MMMM yyyy")</span>
+            </div>
+            <div class="info-card">
+                <i class="fas fa-clock"></i>
+                <span>@Model.TimeFormatted</span>
+            </div>
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.Venue))
+        {
+            <div class="arena-section">
+                <div class="arena-info">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span class="arena-name">@Model.Venue</span>
+                    <span class="arena-home">
+                        <i class="fas fa-home"></i> @Model.HomeTeam.ShortDisplayName
+                    </span>
+                </div>
+            </div>
+        }
+    </div>
+
+    @if (Model.IsGamePlayed)
+    {
+        <div class="team-stats">
+            <div class="stat-section">
+                <div class="stat-header">
+                    <img src="@Model.AwayTeam.Logo" class="stat-header-logo" alt="@Model.AwayTeam.Abbreviation">
+                    <div class="stat-header-info">
+                        <h3>
+                            @Model.AwayTeam.ShortDisplayName
+                            <span class="team-full-name">(@Model.AwayTeam.DisplayName)</span>
+                        </h3>
+                        <div class="score">@Model.AwayTeam.Score</div>
+                    </div>
+                </div>
+                <div class="stat-grid">
+                    @foreach (var stat in Model.AwayTeam.Statistics)
+                    {
+                        <div class="stat-item">
+                            <span class="stat-label">@stat.Key</span>
+                            <span class="stat-value">@stat.Value</span>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="stat-section">
+                <div class="stat-header">
+                    <img src="@Model.HomeTeam.Logo" class="stat-header-logo" alt="@Model.HomeTeam.Abbreviation">
+                    <div class="stat-header-info">
+                        <h3>
+                            @Model.HomeTeam.ShortDisplayName
+                            <span class="team-full-name">(@Model.HomeTeam.DisplayName)</span>
+                        </h3>
+                        <div class="score">@Model.HomeTeam.Score</div>
+                    </div>
+                </div>
+                <div class="stat-grid">
+                    @foreach (var stat in Model.HomeTeam.Statistics)
+                    {
+                        <div class="stat-item">
+                            <span class="stat-label">@stat.Key</span>
+                            <span class="stat-value">@stat.Value</span>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        @if (Model.Leaders != null)
+        {
+            <div class="leaders-section">
+                <div class="leaders-grid">
+                    <div class="leaders-team">
+                        <div class="leaders-header">
+                            <img src="@Model.AwayTeam.Logo" class="leaders-header-logo" alt="@Model.AwayTeam.Abbreviation">
+                            <div class="leaders-header-info">
+                                <h3>@Model.AwayTeam.ShortDisplayName · Лидеры</h3>
+                            </div>
+                        </div>
+                        <div class="leaders-stats">
+                            @if (Model.Leaders.AwayTeamLeaders != null)
+                            {
+                                @if (Model.Leaders.AwayTeamLeaders.PointsLeader != null)
+                                {
+                                    <div class="leader-card">
+                                        <div class="leader-category">Очки</div>
+                                        <a href="@Url.Action("PlayersPage", "PlayersPage", new { playerId = Model.Leaders.AwayTeamLeaders.PointsLeader.PlayerId })" class="leader-name">
+                                            @Model.Leaders.AwayTeamLeaders.PointsLeader.PlayerName
+                                        </a>
+                                        <div class="leader-value">@Model.Leaders.AwayTeamLeaders.PointsLeader.Value</div>
+                                    </div>
+                                }
+                                @if (Model.Leaders.AwayTeamLeaders.ReboundsLeader != null)
+                                {
+                                    <div class="leader-card">
+                                        <div class="leader-category">Подборы</div>
+                                        <a href="@Url.Action("PlayersPage", "PlayersPage", new { playerId = Model.Leaders.AwayTeamLeaders.ReboundsLeader.PlayerId })" class="leader-name">
+                                            @Model.Leaders.AwayTeamLeaders.ReboundsLeader.PlayerName
+                                        </a>
+                                        <div class="leader-value">@Model.Leaders.AwayTeamLeaders.ReboundsLeader.Value</div>
+                                    </div>
+                                }
+                                @if (Model.Leaders.AwayTeamLeaders.AssistsLeader != null)
+                                {
+                                    <div class="leader-card">
+                                        <div class="leader-category">Передачи</div>
+                                        <a href="@Url.Action("PlayersPage", "PlayersPage", new { playerId = Model.Leaders.AwayTeamLeaders.AssistsLeader.PlayerId })" class="leader-name">
+                                            @Model.Leaders.AwayTeamLeaders.AssistsLeader.PlayerName
+                                        </a>
+                                        <div class="leader-value">@Model.Leaders.AwayTeamLeaders.AssistsLeader.Value</div>
+                                    </div>
+                                }
+                            }
+                        </div>
+                    </div>
+
+                    <div class="leaders-team">
+                        <div class="leaders-header">
+                            <img src="@Model.HomeTeam.Logo" class="leaders-header-logo" alt="@Model.HomeTeam.Abbreviation">
+                            <div class="leaders-header-info">
+                                <h3>@Model.HomeTeam.ShortDisplayName · Лидеры</h3>
+                            </div>
+                        </div>
+                        <div class="leaders-stats">
+                            @if (Model.Leaders.HomeTeamLeaders != null)
+                            {
+                                @if (Model.Leaders.HomeTeamLeaders.PointsLeader != null)
+                                {
+                                    <div class="leader-card">
+                                        <div class="leader-category">Очки</div>
+                                        <a href="@Url.Action("PlayersPage", "PlayersPage", new { playerId = Model.Leaders.HomeTeamLeaders.PointsLeader.PlayerId })" class="leader-name">
+                                            @Model.Leaders.HomeTeamLeaders.PointsLeader.PlayerName
+                                        </a>
+                                        <div class="leader-value">@Model.Leaders.HomeTeamLeaders.PointsLeader.Value</div>
+                                    </div>
+                                }
+                                @if (Model.Leaders.HomeTeamLeaders.ReboundsLeader != null)
+                                {
+                                    <div class="leader-card">
+                                        <div class="leader-category">Подборы</div>
+                                        <a href="@Url.Action("PlayersPage", "PlayersPage", new { playerId = Model.Leaders.HomeTeamLeaders.ReboundsLeader.PlayerId })" class="leader-name">
+                                            @Model.Leaders.HomeTeamLeaders.ReboundsLeader.PlayerName
+                                        </a>
+                                        <div class="leader-value">@Model.Leaders.HomeTeamLeaders.ReboundsLeader.Value</div>
+                                    </div>
+                                }
+                                @if (Model.Leaders.HomeTeamLeaders.AssistsLeader != null)
+                                {
+                                    <div class="leader-card">
+                                        <div class="leader-category">Передачи</div>
+                                        <a href="@Url.Action("PlayersPage", "PlayersPage", new { playerId = Model.Leaders.HomeTeamLeaders.AssistsLeader.PlayerId })" class="leader-name">
+                                            @Model.Leaders.HomeTeamLeaders.AssistsLeader.PlayerName
+                                        </a>
+                                        <div class="leader-value">@Model.Leaders.HomeTeamLeaders.AssistsLeader.Value</div>
+                                    </div>
+                                }
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+        
+        <div class="players-section">
+            <div class="players-tabs">
+                <button class="tab-btn active" onclick="showTeamPlayers('away')">
+                    <img src="@Model.AwayTeam.Logo" style="width: 24px; height: 24px; object-fit: contain;">
+                    @Model.AwayTeam.ShortDisplayName
+                </button>
+                <button class="tab-btn" onclick="showTeamPlayers('home')">
+                    <img src="@Model.HomeTeam.Logo" style="width: 24px; height: 24px; object-fit: contain;">
+                    @Model.HomeTeam.ShortDisplayName
+                </button>
+            </div>
+
+            <div id="away-players" class="players-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Игрок</th>
+                            <th>MIN</th>
+                            <th>PTS</th>
+                            <th>FG</th>
+                            <th>3PT</th>
+                            <th>FT</th>
+                            <th>REB</th>
+                            <th>AST</th>
+                            <th>STL</th>
+                            <th>BLK</th>
+                            <th>TO</th>
+                            <th>+/-</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var player in Model.AwayPlayers.OrderByDescending(p => p.IsStarter))
+                        {
+                            var isDNP = string.IsNullOrEmpty(player.Minutes) || player.Minutes == "0" || player.Minutes == "DNP";
+                            if (isDNP)
+                            {
+                                <tr class="dnp-row">
+                                    <td>
+                                        <div class="player-cell">
+                                            @if (player.Id > 0)
+                                            {
+                                                <a href="@Url.Action("PlayersPage", "PlayersPage", new { playerId = player.Id })" class="player-headshot-link">
+                                                    <img src="@player.HeadshotUrl" class="player-headshot" alt="@player.DisplayName"
+                                                         onerror="this.onerror=null; this.src='https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/0.png&w=200&h=200';">
+                                                </a>
+                                                <a href="@Url.Action("PlayersPage", "PlayersPage", new { playerId = player.Id })" class="player-name-link">
+                                                    @player.DisplayName
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                <img src="@player.HeadshotUrl" class="player-headshot" alt="@player.DisplayName"
+                                                     onerror="this.onerror=null; this.src='https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/0.png&w=200&h=200';">
+                                                <span class="player-name-link" style="cursor: default;">@player.DisplayName</span>
+                                            }
+                                            <span class="player-jersey">#@player.Jersey</span>
+                                            @if (player.IsStarter)
+                                            {
+                                                <span class="starter-badge">S</span>
+                                            }
+                                            <span class="dnp-badge">DNP</span>
+                                        </div>
+                                    </td>
+                                    <td colspan="11" class="dnp-text">Не принимал участия в матче</td>
+                                </tr>
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="player-cell">
+                                            @if (player.Id > 0)
+                                            {
+                                                <a href="@Url.Action("PlayersPage", "PlayersPage", new { playerId = player.Id })" class="player-headshot-link">
+                                                    <img src="@player.HeadshotUrl" class="player-headshot" alt="@player.DisplayName"
+                                                         onerror="this.onerror=null; this.src='https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/0.png&w=200&h=200';">
+                                                </a>
+                                                <a href="@Url.Action("PlayersPage", "PlayersPage", new { playerId = player.Id })" class="player-name-link">
+                                                    @player.DisplayName
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                <img src="@player.HeadshotUrl" class="player-headshot" alt="@player.DisplayName"
+                                                     onerror="this.onerror=null; this.src='https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/0.png&w=200&h=200';">
+                                                <span class="player-name-link" style="cursor: default;">@player.DisplayName</span>
+                                            }
+                                            <span class="player-jersey">#@player.Jersey</span>
+                                            @if (player.IsStarter)
+                                            {
+                                                <span class="starter-badge">S</span>
+                                            }
+                                        </div>
+                                    </td>
+                                    <td>@player.Minutes</td>
+                                    <td><strong>@player.Points</strong></td>
+                                    <td>@player.FieldGoals</td>
+                                    <td>@player.ThreePointers</td>
+                                    <td>@player.FreeThrows</td>
+                                    <td>@player.Rebounds</td>
+                                    <td>@player.Assists</td>
+                                    <td>@player.Steals</td>
+                                    <td>@player.Blocks</td>
+                                    <td>@player.Turnovers</td>
+                                    <td>@player.PlusMinus</td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="home-players" class="players-table" style="display: none;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Игрок</th>
+                            <th>MIN</th>
+                            <th>PTS</th>
+                            <th>FG</th>
+                            <th>3PT</th>
+                            <th>FT</th>
+                            <th>REB</th>
+                            <th>AST</th>
+                            <th>STL</th>
+                            <th>BLK</th>
+                            <th>TO</th>
+                            <th>+/-</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var player in Model.HomePlayers.OrderByDescending(p => p.IsStarter))
+                        {
+                            var isDNP = string.IsNullOrEmpty(player.Minutes) || player.Minutes == "0" || player.Minutes == "DNP";
+                            if (isDNP)
+                            {
+                                <tr class="dnp-row">
+                                    <td>
+                                        <div class="player-cell">
+                                            @if (player.Id > 0)
+                                            {
+                                                <a href="@Url.Action("PlayersPage", "PlayersPage", new { playerId = player.Id })" class="player-headshot-link">
+                                                    <img src="@player.HeadshotUrl" class="player-headshot" alt="@player.DisplayName"
+                                                         onerror="this.onerror=null; this.src='https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/0.png&w=200&h=200';">
+                                                </a>
+                                                <a href="@Url.Action("PlayersPage", "PlayersPage", new { playerId = player.Id })" class="player-name-link">
+                                                    @player.DisplayName
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                <img src="@player.HeadshotUrl" class="player-headshot" alt="@player.DisplayName"
+                                                     onerror="this.onerror=null; this.src='https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/0.png&w=200&h=200';">
+                                                <span class="player-name-link" style="cursor: default;">@player.DisplayName</span>
+                                            }
+                                            <span class="player-jersey">#@player.Jersey</span>
+                                            @if (player.IsStarter)
+                                            {
+                                                <span class="starter-badge">S</span>
+                                            }
+                                            <span class="dnp-badge">DNP</span>
+                                        </div>
+                                    </td>
+                                    <td colspan="11" class="dnp-text">Не принимал участия в матче</td>
+                                </tr>
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="player-cell">
+                                            @if (player.Id > 0)
+                                            {
+                                                <a href="@Url.Action("PlayersPage", "PlayersPage", new { playerId = player.Id })" class="player-headshot-link">
+                                                    <img src="@player.HeadshotUrl" class="player-headshot" alt="@player.DisplayName"
+                                                         onerror="this.onerror=null; this.src='https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/0.png&w=200&h=200';">
+                                                </a>
+                                                <a href="@Url.Action("PlayersPage", "PlayersPage", new { playerId = player.Id })" class="player-name-link">
+                                                    @player.DisplayName
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                <img src="@player.HeadshotUrl" class="player-headshot" alt="@player.DisplayName"
+                                                     onerror="this.onerror=null; this.src='https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/0.png&w=200&h=200';">
+                                                <span class="player-name-link" style="cursor: default;">@player.DisplayName</span>
+                                            }
+                                            <span class="player-jersey">#@player.Jersey</span>
+                                            @if (player.IsStarter)
+                                            {
+                                                <span class="starter-badge">S</span>
+                                            }
+                                        </div>
+                                    </td>
+                                    <td>@player.Minutes</td>
+                                    <td><strong>@player.Points</strong></td>
+                                    <td>@player.FieldGoals</td>
+                                    <td>@player.ThreePointers</td>
+                                    <td>@player.FreeThrows</td>
+                                    <td>@player.Rebounds</td>
+                                    <td>@player.Assists</td>
+                                    <td>@player.Steals</td>
+                                    <td>@player.Blocks</td>
+                                    <td>@player.Turnovers</td>
+                                    <td>@player.PlusMinus</td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="no-games" style="padding: 60px;">
+            <i class="fas fa-clock"></i>
+            <p>Матч еще не сыгран</p>
+            <p style="font-size: 1.1em; color: #999;">Информация появится после начала игры</p>
+        </div>
+    }
+
+    <div style="text-align: center; margin-top: 30px;">
+        <a href="javascript:history.back()" class="back-button">
+            <i class="fas fa-arrow-left"></i> Назад
+        </a>
+    </div>
+</div>
+
+<script>
+    function showTeamPlayers(team) {
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.players-table').forEach(table => table.style.display = 'none');
+
+        if (team === 'away') {
+            document.querySelectorAll('.tab-btn')[0].classList.add('active');
+            document.getElementById('away-players').style.display = 'block';
+        } else {
+            document.querySelectorAll('.tab-btn')[1].classList.add('active');
+            document.getElementById('home-players').style.display = 'block';
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        showTeamPlayers('away');
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const images = document.querySelectorAll('.player-headshot');
+        
+        images.forEach((img, index) => {
+            const originalWidth = img.offsetWidth;
+            const originalHeight = img.offsetHeight;
+            
+            if (img.complete) {
+                checkImage(img, index, originalWidth, originalHeight);
+            } else {
+                img.onload = function() {
+                    checkImage(this, index, this.offsetWidth, this.offsetHeight);
+                };
+            }
+            
+            img.onerror = function() {
+                replaceWithBlack(this, originalWidth, originalHeight);
+            };
+        });
+        
+        function checkImage(img, index, width, height) {
+            try {
+                const canvas = document.createElement('canvas');
+                canvas.width = img.width || 30;
+                canvas.height = img.height || 30;
+                const ctx = canvas.getContext('2d', { willReadFrequently: true });
+                
+                try {
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    
+                    const points = [
+                        [Math.floor(canvas.width/2), Math.floor(canvas.height/2)],
+                        [5, 5],
+                        [canvas.width-5, 5],
+                        [5, canvas.height-5],
+                        [canvas.width-5, canvas.height-5]
+                    ];
+                    
+                    let transparentPixels = 0;
+                    
+                    for (let [x, y] of points) {
+                        const pixel = ctx.getImageData(x, y, 1, 1).data;
+                        if (pixel[3] === 0) {
+                            transparentPixels++;
+                        }
+                    }
+                    
+                    if (transparentPixels === points.length) {
+                        replaceWithBlack(img, width, height);
+                    }
+                    
+                } catch (e) {
+                    console.log(e);
+                }
+                
+            } catch (e) {
+                console.log(e);
+            }
+        }
+        
+        function replaceWithBlack(img, width, height) {
+            const parent = img.parentNode;
+            if (parent) {
+                const placeholder = document.createElement('div');
+                placeholder.className = img.className;
+                placeholder.style.width = width + 'px';
+                placeholder.style.height = height + 'px';
+                placeholder.style.backgroundColor = '#000000';
+                placeholder.style.borderRadius = window.getComputedStyle(img).borderRadius;
+                placeholder.style.margin = window.getComputedStyle(img).margin;
+                parent.replaceChild(placeholder, img);
+            }
+        }
+    });
+</script>

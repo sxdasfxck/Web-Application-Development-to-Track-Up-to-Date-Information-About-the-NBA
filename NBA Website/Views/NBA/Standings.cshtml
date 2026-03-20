@@ -1,0 +1,861 @@
+﻿@{
+    ViewData["Title"] = "Турнирная таблица NBA";
+    var currentGroup = ViewBag.CurrentGroup as string ?? "conference";
+}
+
+@{
+    var allStandings = ViewBag.AllStandings as List<NBA_Website.Models.StandingViewModel> ?? new List<NBA_Website.Models.StandingViewModel>();
+    var easternStandings = ViewBag.EasternStandings as List<NBA_Website.Models.StandingViewModel> ?? new List<NBA_Website.Models.StandingViewModel>();
+    var westernStandings = ViewBag.WesternStandings as List<NBA_Website.Models.StandingViewModel> ?? new List<NBA_Website.Models.StandingViewModel>();
+    var divisionGroups = ViewBag.DivisionGroups as Dictionary<string, List<NBA_Website.Models.StandingViewModel>> ?? new Dictionary<string, List<NBA_Website.Models.StandingViewModel>>();
+}
+
+<style>
+    .standings-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    h1 {
+        text-align: center;
+        color: #1a1a1a;
+        margin-bottom: 30px;
+        font-size: 2.5em;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        border-bottom: 3px solid #ff6b35;
+        padding-bottom: 15px;
+    }
+
+    .group-tabs {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+    }
+
+    .group-tab {
+        padding: 12px 25px;
+        background: #f5f5f5;
+        color: #666;
+        border-radius: 30px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: 1px solid #e0e0e0;
+    }
+
+        .group-tab:hover {
+            background: #e8e8e8;
+            transform: translateY(-2px);
+        }
+
+        .group-tab.active {
+            background: #ff6b35;
+            color: white;
+            border-color: #ff6b35;
+        }
+
+        .group-tab i {
+            margin-right: 8px;
+        }
+
+    .conference-section {
+        margin-bottom: 40px;
+    }
+
+    .division-section {
+        margin-bottom: 40px;
+    }
+
+    .division-header {
+        font-size: 1.5em;
+        font-weight: 700;
+        margin: 30px 0 15px;
+        padding: 10px 0;
+        border-bottom: 2px solid;
+        color: #333;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+        .division-header i {
+            color: #ff6b35;
+            font-size: 1.2em;
+        }
+
+    .conference-header {
+        font-size: 1.8em;
+        font-weight: 700;
+        margin: 20px 0;
+        padding: 10px 0;
+        border-bottom: 2px solid;
+    }
+
+        .conference-header.eastern {
+            color: #1d428a;
+            border-bottom-color: #1d428a;
+        }
+
+        .conference-header.western {
+            color: #c8102e;
+            border-bottom-color: #c8102e;
+        }
+
+    .standings-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+        .standings-table th {
+            background: #f5f5f5;
+            color: #333;
+            font-weight: 600;
+            padding: 15px 10px;
+            font-size: 0.85em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: background 0.2s;
+            position: relative;
+        }
+
+            .standings-table th:hover {
+                background: #e8e8e8;
+            }
+
+            .standings-table th.sorted-asc::after {
+                content: ' ↑';
+                color: #ff6b35;
+                font-weight: bold;
+            }
+
+            .standings-table th.sorted-desc::after {
+                content: ' ↓';
+                color: #ff6b35;
+                font-weight: bold;
+            }
+
+        .standings-table td {
+            padding: 12px 10px;
+            border-bottom: 1px solid #eee;
+            color: #666;
+        }
+
+        .standings-table tr:hover {
+            background: #f9f9f9;
+        }
+
+    .team-link {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+        color: inherit;
+        transition: all 0.3s ease;
+        padding: 5px;
+        border-radius: 8px;
+    }
+
+        .team-link:hover {
+            background: rgba(255, 107, 53, 0.1);
+            transform: translateX(5px);
+        }
+
+            .team-link:hover .team-name {
+                color: #ff6b35;
+            }
+
+    .logo-link {
+        display: block;
+        transition: transform 0.3s ease;
+        cursor: pointer;
+    }
+
+        .logo-link:hover {
+            transform: scale(1.1);
+        }
+
+    .logo-cell {
+        text-align: center;
+        padding: 5px !important;
+        width: 50px;
+    }
+
+    .team-logo {
+        width: 35px;
+        height: 35px;
+        object-fit: contain;
+        display: block;
+        margin: 0 auto;
+        transition: all 0.3s ease;
+    }
+
+    .team-name {
+        font-weight: 500;
+        transition: color 0.3s ease;
+    }
+
+    .stat-highlight {
+        font-weight: 600;
+        color: #333;
+    }
+
+    .positive {
+        color: #27ae60;
+    }
+
+    .negative {
+        color: #e74c3c;
+    }
+
+    .sort-controls {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 15px;
+    }
+
+    .reset-sort {
+        background: #ff6b35;
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 0.9em;
+        transition: background 0.2s;
+    }
+
+        .reset-sort:hover {
+            background: #ff5420;
+        }
+
+    .standings-footer {
+        margin-top: 40px;
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 15px;
+        border: 1px solid #e0e0e0;
+    }
+
+    .footer-note {
+        margin-bottom: 25px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #ddd;
+    }
+
+        .footer-note p {
+            color: #666;
+            font-size: 0.95em;
+            margin: 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .footer-note i {
+            color: #ff6b35;
+            width: 20px;
+            font-size: 1.1em;
+        }
+
+    .play-in-note {
+        font-weight: 500;
+    }
+
+    .glossary h3 {
+        color: #333;
+        font-size: 1.2em;
+        font-weight: 700;
+        margin-bottom: 20px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .glossary-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+    }
+
+    .glossary-item {
+        color: #666;
+        font-size: 0.9em;
+        line-height: 1.5;
+    }
+
+    .abbr {
+        font-weight: 700;
+        color: #ff6b35;
+        margin-right: 8px;
+        display: inline-block;
+        min-width: 60px;
+    }
+
+    @@media (max-width: 768px) {
+        .glossary-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @@media (max-width: 480px) {
+        .glossary-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="standings-container">
+    <h1>
+        <i class="fas fa-table" style="color: #ff6b35; margin-right: 10px;"></i>
+        Турнирная таблица NBA
+    </h1>
+
+    <div class="group-tabs">
+        <a href="/NBA/Standings?group=league" class="group-tab @(currentGroup == "league" ? "active" : "")">
+            <i class="fas fa-globe"></i> Все команды
+        </a>
+        <a href="/NBA/Standings?group=conference" class="group-tab @(currentGroup == "conference" ? "active" : "")">
+            <i class="fas fa-flag"></i> По конференциям
+        </a>
+        <a href="/NBA/Standings?group=division" class="group-tab @(currentGroup == "division" ? "active" : "")">
+            <i class="fas fa-layer-group"></i> По дивизионам
+        </a>
+    </div>
+
+    <div class="sort-controls">
+        <button class="reset-sort" onclick="resetSort()">
+            <i class="fas fa-undo-alt"></i> Сбросить сортировку
+        </button>
+    </div>
+
+    @if (currentGroup == "league")
+    {
+        <table class="standings-table" id="league-table">
+            <thead>
+                <tr>
+                    <th class="logo-header"></th>
+                    <th onclick="sortTable('league', 'team')">Команда</th>
+                    <th onclick="sortTable('league', 'wins')">W</th>
+                    <th onclick="sortTable('league', 'losses')">L</th>
+                    <th onclick="sortTable('league', 'pct')">PCT</th>
+                    <th onclick="sortTable('league', 'gb')">GB</th>
+                    <th onclick="sortTable('league', 'home')">HOME</th>
+                    <th onclick="sortTable('league', 'away')">AWAY</th>
+                    <th onclick="sortTable('league', 'div')">DIV</th>
+                    <th onclick="sortTable('league', 'conf')">CONF</th>
+                    <th onclick="sortTable('league', 'ppg')">PPG</th>
+                    <th onclick="sortTable('league', 'opp')">OPP</th>
+                    <th onclick="sortTable('league', 'diff')">DIFF</th>
+                    <th onclick="sortTable('league', 'strk')">STRK</th>
+                    <th onclick="sortTable('league', 'l10')">L10</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var team in allStandings)
+                {
+                    <tr data-team="@team.TeamName"
+                        data-wins="@team.Wins"
+                        data-losses="@team.Losses"
+                        data-pct="@team.WinPct"
+                        data-gb="@team.GamesBack"
+                        data-home="@team.HomeRecord"
+                        data-away="@team.AwayRecord"
+                        data-div="@team.DivisionRecord"
+                        data-conf="@team.ConferenceRecord"
+                        data-ppg="@team.PPG"
+                        data-opp="@team.OppPPG"
+                        data-diff="@team.Diff"
+                        data-strk="@team.Streak"
+                        data-l10="@team.Last10">
+                        <td class="logo-cell">
+                            <a href="@Url.Action("TeamDetails", "Team", new { abbrev = team.TeamAbbrev })" class="logo-link">
+                                <img src="https://a.espncdn.com/i/teamlogos/nba/500/@(team.TeamAbbrev.ToLower()).png"
+                                     alt="@team.TeamName logo"
+                                     class="team-logo"
+                                     onerror="this.onerror=null; this.style.display='none'">
+                            </a>
+                        </td>
+                        <td>
+                            <a href="@Url.Action("TeamDetails", "Team", new { abbrev = team.TeamAbbrev })" class="team-link">
+                                <span class="team-name">@team.TeamName</span>
+                            </a>
+                        </td>
+                        <td class="stat-highlight">@team.Wins</td>
+                        <td class="stat-highlight">@team.Losses</td>
+                        <td>@team.WinPct.ToString("F3")</td>
+                        <td>@(team.GamesBack == 0 ? "-" : team.GamesBack.ToString("F1"))</td>
+                        <td>@team.HomeRecord</td>
+                        <td>@team.AwayRecord</td>
+                        <td>@team.DivisionRecord</td>
+                        <td>@team.ConferenceRecord</td>
+                        <td>@team.PPG.ToString("F1")</td>
+                        <td>@team.OppPPG.ToString("F1")</td>
+                        <td class="@(team.Diff >= 0 ? "positive" : "negative")">
+                            @(team.Diff >= 0 ? "+" : "")@team.Diff.ToString("F1")
+                        </td>
+                        <td>@team.Streak</td>
+                        <td>@team.Last10</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+
+    @if (currentGroup == "conference")
+    {
+        @if (easternStandings.Any())
+        {
+            <div class="conference-section" id="eastern-conference">
+                <div class="conference-header eastern">
+                    <i class="fas fa-globe-americas"></i> Восточная конференция
+                </div>
+
+                <table class="standings-table" id="eastern-table">
+                    <thead>
+                        <tr>
+                            <th class="logo-header"></th>
+                            <th onclick="sortTable('eastern', 'team')">Команда</th>
+                            <th onclick="sortTable('eastern', 'wins')">W</th>
+                            <th onclick="sortTable('eastern', 'losses')">L</th>
+                            <th onclick="sortTable('eastern', 'pct')">PCT</th>
+                            <th onclick="sortTable('eastern', 'gb')">GB</th>
+                            <th onclick="sortTable('eastern', 'home')">HOME</th>
+                            <th onclick="sortTable('eastern', 'away')">AWAY</th>
+                            <th onclick="sortTable('eastern', 'div')">DIV</th>
+                            <th onclick="sortTable('eastern', 'conf')">CONF</th>
+                            <th onclick="sortTable('eastern', 'ppg')">PPG</th>
+                            <th onclick="sortTable('eastern', 'opp')">OPP</th>
+                            <th onclick="sortTable('eastern', 'diff')">DIFF</th>
+                            <th onclick="sortTable('eastern', 'strk')">STRK</th>
+                            <th onclick="sortTable('eastern', 'l10')">L10</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var team in easternStandings)
+                        {
+                            <tr data-team="@team.TeamName"
+                                data-wins="@team.Wins"
+                                data-losses="@team.Losses"
+                                data-pct="@team.WinPct"
+                                data-gb="@team.GamesBack"
+                                data-home="@team.HomeRecord"
+                                data-away="@team.AwayRecord"
+                                data-div="@team.DivisionRecord"
+                                data-conf="@team.ConferenceRecord"
+                                data-ppg="@team.PPG"
+                                data-opp="@team.OppPPG"
+                                data-diff="@team.Diff"
+                                data-strk="@team.Streak"
+                                data-l10="@team.Last10">
+                                <td class="logo-cell">
+                                    <a href="@Url.Action("TeamDetails", "Team", new { abbrev = team.TeamAbbrev })" class="logo-link">
+                                        <img src="https://a.espncdn.com/i/teamlogos/nba/500/@(team.TeamAbbrev.ToLower()).png"
+                                             alt="@team.TeamName logo"
+                                             class="team-logo"
+                                             onerror="this.onerror=null; this.style.display='none'">
+                                    </a>
+                                </td>
+                                <td>
+                                    <a href="@Url.Action("TeamDetails", "Team", new { abbrev = team.TeamAbbrev })" class="team-link">
+                                        <span class="team-name">@team.TeamName</span>
+                                    </a>
+                                </td>
+                                <td class="stat-highlight">@team.Wins</td>
+                                <td class="stat-highlight">@team.Losses</td>
+                                <td>@team.WinPct.ToString("F3")</td>
+                                <td>@(team.GamesBack == 0 ? "-" : team.GamesBack.ToString("F1"))</td>
+                                <td>@team.HomeRecord</td>
+                                <td>@team.AwayRecord</td>
+                                <td>@team.DivisionRecord</td>
+                                <td>@team.ConferenceRecord</td>
+                                <td>@team.PPG.ToString("F1")</td>
+                                <td>@team.OppPPG.ToString("F1")</td>
+                                <td class="@(team.Diff >= 0 ? "positive" : "negative")">
+                                    @(team.Diff >= 0 ? "+" : "")@team.Diff.ToString("F1")
+                                </td>
+                                <td>@team.Streak</td>
+                                <td>@team.Last10</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+
+        @if (westernStandings.Any())
+        {
+            <div class="conference-section" id="western-conference">
+                <div class="conference-header western">
+                    <i class="fas fa-globe-asia"></i> Западная конференция
+                </div>
+
+                <table class="standings-table" id="western-table">
+                    <thead>
+                        <tr>
+                            <th class="logo-header"></th>
+                            <th onclick="sortTable('western', 'team')">Команда</th>
+                            <th onclick="sortTable('western', 'wins')">W</th>
+                            <th onclick="sortTable('western', 'losses')">L</th>
+                            <th onclick="sortTable('western', 'pct')">PCT</th>
+                            <th onclick="sortTable('western', 'gb')">GB</th>
+                            <th onclick="sortTable('western', 'home')">HOME</th>
+                            <th onclick="sortTable('western', 'away')">AWAY</th>
+                            <th onclick="sortTable('western', 'div')">DIV</th>
+                            <th onclick="sortTable('western', 'conf')">CONF</th>
+                            <th onclick="sortTable('western', 'ppg')">PPG</th>
+                            <th onclick="sortTable('western', 'opp')">OPP</th>
+                            <th onclick="sortTable('western', 'diff')">DIFF</th>
+                            <th onclick="sortTable('western', 'strk')">STRK</th>
+                            <th onclick="sortTable('western', 'l10')">L10</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var team in westernStandings)
+                        {
+                            <tr data-team="@team.TeamName"
+                                data-wins="@team.Wins"
+                                data-losses="@team.Losses"
+                                data-pct="@team.WinPct"
+                                data-gb="@team.GamesBack"
+                                data-home="@team.HomeRecord"
+                                data-away="@team.AwayRecord"
+                                data-div="@team.DivisionRecord"
+                                data-conf="@team.ConferenceRecord"
+                                data-ppg="@team.PPG"
+                                data-opp="@team.OppPPG"
+                                data-diff="@team.Diff"
+                                data-strk="@team.Streak"
+                                data-l10="@team.Last10">
+                                <td class="logo-cell">
+                                    <a href="@Url.Action("TeamDetails", "Team", new { abbrev = team.TeamAbbrev })" class="logo-link">
+                                        <img src="https://a.espncdn.com/i/teamlogos/nba/500/@(team.TeamAbbrev.ToLower()).png"
+                                             alt="@team.TeamName logo"
+                                             class="team-logo"
+                                             onerror="this.onerror=null; this.style.display='none'">
+                                    </a>
+                                </td>
+                                <td>
+                                    <a href="@Url.Action("TeamDetails", "Team", new { abbrev = team.TeamAbbrev })" class="team-link">
+                                        <span class="team-name">@team.TeamName</span>
+                                    </a>
+                                </td>
+                                <td class="stat-highlight">@team.Wins</td>
+                                <td class="stat-highlight">@team.Losses</td>
+                                <td>@team.WinPct.ToString("F3")</td>
+                                <td>@(team.GamesBack == 0 ? "-" : team.GamesBack.ToString("F1"))</td>
+                                <td>@team.HomeRecord</td>
+                                <td>@team.AwayRecord</td>
+                                <td>@team.DivisionRecord</td>
+                                <td>@team.ConferenceRecord</td>
+                                <td>@team.PPG.ToString("F1")</td>
+                                <td>@team.OppPPG.ToString("F1")</td>
+                                <td class="@(team.Diff >= 0 ? "positive" : "negative")">
+                                    @(team.Diff >= 0 ? "+" : "")@team.Diff.ToString("F1")
+                                </td>
+                                <td>@team.Streak</td>
+                                <td>@team.Last10</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    }
+
+    @if (currentGroup == "division")
+    {
+        var conferenceDivisions = new Dictionary<string, List<string>>
+        {
+        { "Eastern", new List<string> { "Atlantic", "Central", "Southeast" } },
+        { "Western", new List<string> { "Northwest", "Pacific", "Southwest" } }
+        };
+
+        @foreach (var conference in conferenceDivisions.Keys)
+        {
+            <div class="conference-header @(conference.ToLower())">
+                <i class="fas fa-globe-@(conference == "Eastern" ? "americas" : "asia")"></i>
+                @conference Conference
+            </div>
+
+            @foreach (var division in conferenceDivisions[conference])
+            {
+                if (divisionGroups.ContainsKey(division))
+                {
+                    <div class="division-section">
+                        <div class="division-header">
+                            <i class="fas fa-layer-group"></i> @division дивизион
+                        </div>
+
+                        <table class="standings-table" id="division-@division">
+                            <thead>
+                                <tr>
+                                    <th class="logo-header"></th>
+                                    <th onclick="sortTable('@division', 'team')">Команда</th>
+                                    <th onclick="sortTable('@division', 'wins')">W</th>
+                                    <th onclick="sortTable('@division', 'losses')">L</th>
+                                    <th onclick="sortTable('@division', 'pct')">PCT</th>
+                                    <th onclick="sortTable('@division', 'gb')">GB</th>
+                                    <th onclick="sortTable('@division', 'home')">HOME</th>
+                                    <th onclick="sortTable('@division', 'away')">AWAY</th>
+                                    <th onclick="sortTable('@division', 'div')">DIV</th>
+                                    <th onclick="sortTable('@division', 'conf')">CONF</th>
+                                    <th onclick="sortTable('@division', 'ppg')">PPG</th>
+                                    <th onclick="sortTable('@division', 'opp')">OPP</th>
+                                    <th onclick="sortTable('@division', 'diff')">DIFF</th>
+                                    <th onclick="sortTable('@division', 'strk')">STRK</th>
+                                    <th onclick="sortTable('@division', 'l10')">L10</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var team in divisionGroups[division])
+                                {
+                                    <tr data-team="@team.TeamName"
+                                        data-wins="@team.Wins"
+                                        data-losses="@team.Losses"
+                                        data-pct="@team.WinPct"
+                                        data-gb="@team.GamesBack"
+                                        data-home="@team.HomeRecord"
+                                        data-away="@team.AwayRecord"
+                                        data-div="@team.DivisionRecord"
+                                        data-conf="@team.ConferenceRecord"
+                                        data-ppg="@team.PPG"
+                                        data-opp="@team.OppPPG"
+                                        data-diff="@team.Diff"
+                                        data-strk="@team.Streak"
+                                        data-l10="@team.Last10">
+                                        <td class="logo-cell">
+                                            <a href="@Url.Action("TeamDetails", "Team", new { abbrev = team.TeamAbbrev })" class="logo-link">
+                                                <img src="https://a.espncdn.com/i/teamlogos/nba/500/@(team.TeamAbbrev.ToLower()).png"
+                                                     alt="@team.TeamName logo"
+                                                     class="team-logo"
+                                                     onerror="this.onerror=null; this.style.display='none'">
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <a href="@Url.Action("TeamDetails", "Team", new { abbrev = team.TeamAbbrev })" class="team-link">
+                                                <span class="team-name">@team.TeamName</span>
+                                            </a>
+                                        </td>
+                                        <td class="stat-highlight">@team.Wins</td>
+                                        <td class="stat-highlight">@team.Losses</td>
+                                        <td>@team.WinPct.ToString("F3")</td>
+                                        <td>@(team.GamesBack == 0 ? "-" : team.GamesBack.ToString("F1"))</td>
+                                        <td>@team.HomeRecord</td>
+                                        <td>@team.AwayRecord</td>
+                                        <td>@team.DivisionRecord</td>
+                                        <td>@team.ConferenceRecord</td>
+                                        <td>@team.PPG.ToString("F1")</td>
+                                        <td>@team.OppPPG.ToString("F1")</td>
+                                        <td class="@(team.Diff >= 0 ? "positive" : "negative")">
+                                            @(team.Diff >= 0 ? "+" : "")@team.Diff.ToString("F1")
+                                        </td>
+                                        <td>@team.Streak</td>
+                                        <td>@team.Last10</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            }
+        }
+    }
+
+    <div class="standings-footer">
+        <div class="footer-note">
+            <p><i class="fas fa-info-circle"></i> Турнирная таблица обновляется по завершении каждой игры.</p>
+
+            @if (currentGroup == "conference")
+            {
+                <p class="play-in-note"><i class="fas fa-trophy"></i> Команды, посеянные под номерами 7-10 в каждой конференции, примут участие в квалификационном турнире по итогам регулярного сезона.</p>
+            }
+        </div>
+
+        <div class="glossary">
+            <h3>GLOSSARY</h3>
+            <div class="glossary-grid">
+                <div class="glossary-item"><span class="abbr">W:</span> Победы</div>
+                <div class="glossary-item"><span class="abbr">AWAY:</span> Рекорд на гостевой площадке</div>
+                <div class="glossary-item"><span class="abbr">DIFF:</span> Средняя разница очков</div>
+
+                <div class="glossary-item"><span class="abbr">L:</span> Поражения</div>
+                <div class="glossary-item"><span class="abbr">DIV:</span> Рекорд в дивизионе</div>
+                <div class="glossary-item"><span class="abbr">STRK:</span> Текущая серия</div>
+
+                <div class="glossary-item"><span class="abbr">PCT:</span> Процент побед</div>
+                <div class="glossary-item"><span class="abbr">CONF:</span> Рекорд в конференции</div>
+                <div class="glossary-item"><span class="abbr">L10:</span> Рекорд за последние 10 игр</div>
+
+                <div class="glossary-item"><span class="abbr">GB:</span> Отставание от первого места</div>
+                <div class="glossary-item"><span class="abbr">PPG:</span> Набранные очки за игру в среднем</div>
+                <div class="glossary-item"></div>
+
+                <div class="glossary-item"><span class="abbr">HOME:</span> Рекорд на домашней площадке</div>
+                <div class="glossary-item"><span class="abbr">OPP PPG:</span> Пропущенные очки за игру в среднем</div>
+                <div class="glossary-item"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentSort = {
+        league: { column: 'team', direction: 'asc' },
+        eastern: { column: 'team', direction: 'asc' },
+        western: { column: 'team', direction: 'asc' },
+        Atlantic: { column: 'team', direction: 'asc' },
+        Central: { column: 'team', direction: 'asc' },
+        Southeast: { column: 'team', direction: 'asc' },
+        Northwest: { column: 'team', direction: 'asc' },
+        Pacific: { column: 'team', direction: 'asc' },
+        Southwest: { column: 'team', direction: 'asc' }
+    };
+
+    function sortTable(conference, column) {
+        const table = document.getElementById(conference === 'league' ? 'league-table' :
+                                              (conference === 'eastern' ? 'eastern-table' :
+                                               conference === 'western' ? 'western-table' :
+                                               'division-' + conference));
+        if (!table) return;
+
+        const tbody = table.querySelector('tbody');
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+        const headers = table.querySelectorAll('th');
+
+        let direction = 'asc';
+        if (currentSort[conference] && currentSort[conference].column === column) {
+            direction = currentSort[conference].direction === 'asc' ? 'desc' : 'asc';
+        }
+
+        headers.forEach(h => {
+            h.classList.remove('sorted-asc', 'sorted-desc');
+        });
+
+        const clickedHeader = event.target;
+        clickedHeader.classList.add(direction === 'asc' ? 'sorted-asc' : 'sorted-desc');
+
+        rows.sort((a, b) => {
+            let aVal = a.dataset[column];
+            let bVal = b.dataset[column];
+
+            if (column === 'home' || column === 'away' || column === 'div' || column === 'conf') {
+                const aParts = aVal.split('-');
+                const bParts = bVal.split('-');
+                const aWins = parseInt(aParts[0]);
+                const aLosses = parseInt(aParts[1]);
+                const bWins = parseInt(bParts[0]);
+                const bLosses = parseInt(bParts[1]);
+
+                if (direction === 'asc') {
+                    if (aWins !== bWins) return aWins - bWins;
+                    return bLosses - aLosses;
+                } else {
+                    if (aWins !== bWins) return bWins - aWins;
+                    return aLosses - bLosses;
+                }
+            }
+
+            if (column === 'strk') {
+                const aType = aVal.charAt(0);
+                const aNum = parseInt(aVal.substring(1));
+                const bType = bVal.charAt(0);
+                const bNum = parseInt(bVal.substring(1));
+
+                if (direction === 'asc') {
+                    if (aType !== bType) return aType === 'W' ? -1 : 1;
+                    if (aType === 'W') return bNum - aNum;
+                    return aNum - bNum;
+                } else {
+                    if (aType !== bType) return aType === 'L' ? -1 : 1;
+                    if (aType === 'L') return bNum - aNum;
+                    return aNum - bNum;
+                }
+            }
+
+            if (column === 'l10') {
+                const aParts = aVal.split('-');
+                const bParts = bVal.split('-');
+                const aWins = parseInt(aParts[0]);
+                const aLosses = parseInt(aParts[1]);
+                const bWins = parseInt(bParts[0]);
+                const bLosses = parseInt(bParts[1]);
+
+                if (direction === 'asc') {
+                    if (aWins !== bWins) return aWins - bWins;
+                    return bLosses - aLosses;
+                } else {
+                    if (aWins !== bWins) return bWins - aWins;
+                    return aLosses - bLosses;
+                }
+            }
+
+            if (column === 'pct' || column === 'gb' || column === 'ppg' || column === 'opp' || column === 'diff') {
+                aVal = parseFloat(aVal);
+                bVal = parseFloat(bVal);
+            } else if (column === 'wins' || column === 'losses') {
+                aVal = parseInt(aVal);
+                bVal = parseInt(bVal);
+            } else if (column === 'team') {
+                return direction === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+            }
+
+            if (direction === 'asc') {
+                return aVal > bVal ? 1 : -1;
+            } else {
+                return aVal < bVal ? 1 : -1;
+            }
+        });
+
+        rows.forEach(row => tbody.appendChild(row));
+
+        if (!currentSort[conference]) currentSort[conference] = {};
+        currentSort[conference] = { column, direction };
+    }
+
+    function resetSort() {
+        const tables = ['league-table', 'eastern-table', 'western-table',
+                       'division-Atlantic', 'division-Central', 'division-Southeast',
+                       'division-Northwest', 'division-Pacific', 'division-Southwest'];
+
+        tables.forEach(tableId => {
+            const table = document.getElementById(tableId);
+            if (!table) return;
+
+            const tbody = table.querySelector('tbody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+
+            rows.sort((a, b) => {
+                let aWins = parseInt(a.dataset.wins);
+                let bWins = parseInt(b.dataset.wins);
+                return bWins - aWins;
+            });
+
+            rows.forEach(row => tbody.appendChild(row));
+        });
+
+        document.querySelectorAll('th').forEach(h => {
+            h.classList.remove('sorted-asc', 'sorted-desc');
+        });
+
+        currentSort = {
+            league: { column: 'team', direction: 'asc' },
+            eastern: { column: 'team', direction: 'asc' },
+            western: { column: 'team', direction: 'asc' },
+            Atlantic: { column: 'team', direction: 'asc' },
+            Central: { column: 'team', direction: 'asc' },
+            Southeast: { column: 'team', direction: 'asc' },
+            Northwest: { column: 'team', direction: 'asc' },
+            Pacific: { column: 'team', direction: 'asc' },
+            Southwest: { column: 'team', direction: 'asc' }
+        };
+    }
+</script>

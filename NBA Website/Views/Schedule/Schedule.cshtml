@@ -1,0 +1,632 @@
+﻿@model NBA_Website.Models.ScheduleViewModel
+
+@{
+    ViewData["Title"] = $"Расписание {Model.TeamName}";
+    var teamAbbrev = Model.TeamAbbrev;
+
+    var now = DateTime.UtcNow;
+    var playedGames = Model.Events.Where(g => g.IsGamePlayed).OrderByDescending(g => g.Date).ToList();
+    var upcomingGames = Model.Events.Where(g => !g.IsGamePlayed && g.Date > now).OrderBy(g => g.Date).ToList();
+}
+
+<style>
+    .schedule-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 30px 20px;
+    }
+
+    .team-header {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 20px;
+        padding: 40px;
+        margin-bottom: 30px;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid #e0e0e0;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+
+        .team-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 8px;
+            background: linear-gradient(90deg, # @Model.TeamColor 0%, # @Model.TeamColor 100%);
+        }
+
+    .team-header-content {
+        display: flex;
+        align-items: center;
+        gap: 40px;
+        flex-wrap: wrap;
+    }
+
+    .team-logo {
+        width: 150px;
+        height: 150px;
+        object-fit: contain;
+        filter: drop-shadow(0 10px 20px rgba(0,0,0,0.2));
+        background: white;
+        border-radius: 50%;
+        padding: 20px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .team-title {
+        flex: 1;
+    }
+
+    .team-name {
+        font-size: 2.5em;
+        font-weight: 800;
+        color: #1a1a1a;
+        margin-bottom: 10px;
+        letter-spacing: -0.02em;
+    }
+
+    .team-season {
+        font-size: 1.2em;
+        color: #666;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+        .team-season i {
+            color: #ff6b35;
+        }
+
+    .team-badges {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .badge {
+        background: #ff6b35;
+        color: white;
+        padding: 8px 20px;
+        border-radius: 25px;
+        font-size: 1em;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .badge-outline {
+        background: transparent;
+        color: #666;
+        border: 1px solid #ddd;
+    }
+
+    .filters {
+        display: flex;
+        gap: 15px;
+        margin: 30px 0;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .filter-btn {
+        background: #f0f0f0;
+        color: #666;
+        padding: 10px 25px;
+        border-radius: 30px;
+        font-size: 1em;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+    }
+
+        .filter-btn.active {
+            background: #ff6b35;
+            color: white;
+        }
+
+        .filter-btn:hover {
+            background: #ff6b35;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+    .games-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 15px;
+        margin-top: 30px;
+    }
+
+    .game-card {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        border: 1px solid #e0e0e0;
+        transition: transform 0.3s ease;
+        display: flex;
+        align-items: center;
+        padding: 20px;
+    }
+
+        .game-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+        }
+
+    .game-date {
+        min-width: 120px;
+        text-align: center;
+        padding-right: 20px;
+        border-right: 2px solid #f0f0f0;
+    }
+
+        .game-date .day {
+            font-size: 2em;
+            font-weight: 700;
+            color: #333;
+            line-height: 1;
+        }
+
+        .game-date .month {
+            font-size: 1em;
+            color: #ff6b35;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .game-date .time {
+            font-size: 0.9em;
+            color: #999;
+            margin-top: 5px;
+        }
+
+    .game-teams {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 20px;
+    }
+
+    .team-display {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        min-width: 200px;
+        text-decoration: none;
+        color: inherit;
+        transition: transform 0.2s ease;
+    }
+
+        .team-display:hover {
+            transform: scale(1.02);
+        }
+
+        .team-display.away {
+            justify-content: flex-end;
+        }
+
+    .team-logo-small {
+        width: 50px;
+        height: 50px;
+        object-fit: contain;
+        transition: transform 0.2s ease;
+    }
+
+    .team-display:hover .team-logo-small {
+        transform: scale(1.1);
+    }
+
+    .team-info {
+        text-align: left;
+    }
+
+    .team-display.away .team-info {
+        text-align: right;
+    }
+
+    .team-city {
+        font-size: 0.85em;
+        color: #999;
+    }
+
+    .team-name-small {
+        font-size: 1.1em;
+        font-weight: 600;
+        color: #333;
+    }
+
+    .team-display:hover .team-name-small {
+        color: #ff6b35;
+    }
+
+    .game-score-link {
+        text-decoration: none;
+        display: inline-block;
+        transition: transform 0.2s ease;
+    }
+
+        .game-score-link:hover {
+            transform: scale(1.05);
+        }
+
+    .game-score {
+        font-size: 1.8em;
+        font-weight: 700;
+        padding: 0 20px;
+        min-width: 100px;
+        text-align: center;
+    }
+
+        .game-score .winner {
+            color: #27ae60;
+            font-weight: 800;
+        }
+
+        .game-score .loser {
+            color: #e74c3c;
+        }
+
+    .game-status {
+        min-width: 150px;
+        text-align: center;
+        padding-left: 20px;
+        border-left: 2px solid #f0f0f0;
+    }
+
+    .status-badge-scheduled {
+        background: #f39c12;
+        color: white;
+        padding: 6px 15px;
+        border-radius: 20px;
+        font-size: 0.9em;
+        font-weight: 600;
+        display: inline-block;
+    }
+
+    .status-badge-final {
+        background: #27ae60;
+        color: white;
+        padding: 6px 15px;
+        border-radius: 20px;
+        font-size: 0.9em;
+        font-weight: 600;
+        display: inline-block;
+    }
+
+    .result-badge {
+        display: inline-block;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        color: white;
+        font-weight: 700;
+        line-height: 30px;
+        text-align: center;
+        margin-bottom: 5px;
+    }
+
+        .result-badge.W {
+            background: #27ae60;
+        }
+
+        .result-badge.L {
+            background: #e74c3c;
+        }
+
+    .venue-info {
+        font-size: 0.85em;
+        color: #999;
+        margin-top: 5px;
+    }
+
+    .home-arena {
+        font-size: 0.8em;
+        color: #ff6b35;
+        font-weight: 600;
+        margin-top: 4px;
+    }
+
+    .back-button {
+        display: inline-block;
+        background: #ff6b35;
+        color: white;
+        padding: 12px 30px;
+        border-radius: 30px;
+        text-decoration: none;
+        font-weight: 600;
+        margin-top: 30px;
+        transition: all 0.3s ease;
+    }
+
+        .back-button:hover {
+            background: #ff5420;
+            transform: translateX(-5px);
+            box-shadow: 0 5px 15px rgba(255,107,53,0.3);
+        }
+
+    .no-games {
+        text-align: center;
+        padding: 80px;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 20px;
+        color: #666;
+    }
+
+        .no-games i {
+            font-size: 5em;
+            color: #ccc;
+            margin-bottom: 20px;
+        }
+
+        .no-games p {
+            font-size: 1.5em;
+            font-weight: 600;
+        }
+
+    @@media (max-width: 992px) {
+        .game-card {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .game-date {
+            border-right: none;
+            border-bottom: 2px solid #f0f0f0;
+            padding-right: 0;
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+            width: 100%;
+        }
+
+        .game-teams {
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+            padding: 0;
+        }
+
+        .team-display {
+            width: 100%;
+            justify-content: center;
+        }
+
+            .team-display.away {
+                justify-content: center;
+            }
+
+                .team-info, .team-display.away .team-info {
+                    text-align: left;
+                }
+
+        .game-score {
+            padding: 15px 0;
+        }
+
+        .game-status {
+            border-left: none;
+            border-top: 2px solid #f0f0f0;
+            padding-left: 0;
+            padding-top: 15px;
+            margin-top: 15px;
+            width: 100%;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .team-header-content {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .team-name {
+            font-size: 2em;
+        }
+    }
+</style>
+
+<div class="schedule-container">
+    <div class="team-header">
+        <div class="team-header-content">
+            <img src="@Model.TeamLogo" class="team-logo" alt="@Model.TeamName"
+                 onerror="this.onerror=null; this.src='https://a.espncdn.com/i/teamlogos/nba/500/default.png';">
+            <div class="team-title">
+                <h1 class="team-name">@(string.IsNullOrEmpty(Model.TeamName) ? Model.TeamAbbrev : Model.TeamName)</h1>
+                <div class="team-badges">
+                    <span class="badge" style="background: #@Model.TeamColor;">@Model.TeamAbbrev</span>
+                    @if (!string.IsNullOrEmpty(Model.TeamRecord))
+                    {
+                        <span class="badge-outline" style="padding: 6px 15px;">
+                            <i class="fas fa-chart-line"></i> @Model.TeamRecord
+                        </span>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (Model.Events.Any())
+    {
+        <div class="filters">
+            <button class="filter-btn active" onclick="filterGames('played')">Сыгранные (@playedGames.Count)</button>
+            <button class="filter-btn" onclick="filterGames('upcoming')">Предстоящие (@upcomingGames.Count)</button>
+        </div>
+
+        <div class="games-grid" id="played-games">
+            @foreach (var game in playedGames)
+            {
+                <div class="game-card played">
+                    <div class="game-date">
+                        <div class="day">@game.Date.ToString("dd")</div>
+                        <div class="month">@game.Date.ToString("MMM")</div>
+                        <div class="time">@game.Date.ToString("HH:mm")</div>
+                    </div>
+
+                    <div class="game-teams">
+                        <a href="@Url.Action("TeamDetails", "Team", new { abbrev = game.AwayTeam.Abbreviation })" class="team-display @(game.AwayTeam.IsWinner ? "winner" : "")">
+                            <img src="@(string.IsNullOrEmpty(game.AwayTeam.Logo) ? $"https://a.espncdn.com/i/teamlogos/nba/500/{game.AwayTeam.Abbreviation.ToLower()}.png" : game.AwayTeam.Logo)"
+                                 class="team-logo-small"
+                                 alt="@game.AwayTeam.Abbreviation"
+                                 onerror="this.onerror=null; this.src='https://a.espncdn.com/i/teamlogos/nba/500/default.png';">
+                            <div class="team-info">
+                                <div class="team-city">@game.AwayTeam.Location</div>
+                                <div class="team-name-small">
+                                    @game.AwayTeam.ShortDisplayName
+                                </div>
+                            </div>
+                        </a>
+
+                        <a href="@Url.Action("Match", "Match", new { id = game.Id })" class="game-score-link">
+                            <div class="game-score">
+                                <span class="@(game.AwayTeam.IsWinner ? "winner" : "loser")">@game.AwayTeam.Score</span>
+                                <span> - </span>
+                                <span class="@(game.HomeTeam.IsWinner ? "winner" : "loser")">@game.HomeTeam.Score</span>
+                            </div>
+                        </a>
+
+                        <a href="@Url.Action("TeamDetails", "Team", new { abbrev = game.HomeTeam.Abbreviation })" class="team-display away @(game.HomeTeam.IsWinner ? "winner" : "")">
+                            <div class="team-info">
+                                <div class="team-city">@game.HomeTeam.Location</div>
+                                <div class="team-name-small">
+                                    @game.HomeTeam.ShortDisplayName
+                                </div>
+                            </div>
+                            <img src="@(string.IsNullOrEmpty(game.HomeTeam.Logo) ? $"https://a.espncdn.com/i/teamlogos/nba/500/{game.HomeTeam.Abbreviation.ToLower()}.png" : game.HomeTeam.Logo)"
+                                 class="team-logo-small"
+                                 alt="@game.HomeTeam.Abbreviation"
+                                 onerror="this.onerror=null; this.src='https://a.espncdn.com/i/teamlogos/nba/500/default.png';">
+                        </a>
+                    </div>
+
+                    <div class="game-status">
+                        <div class="result-badge @game.Result">@game.Result</div>
+                        <div class="status-badge-final">Завершен</div>
+                        <div class="venue-info">
+                            @game.Venue
+                            @if (!string.IsNullOrEmpty(game.Venue))
+                            {
+                                <div class="home-arena">
+                                    🏠 @game.HomeTeam.ShortDisplayName
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="games-grid" id="upcoming-games" style="display: none;">
+            @foreach (var game in upcomingGames)
+            {
+                <div class="game-card upcoming">
+                    <div class="game-date">
+                        <div class="day">@game.Date.ToString("dd")</div>
+                        <div class="month">@game.Date.ToString("MMM")</div>
+                        <div class="time">@game.Date.ToString("HH:mm")</div>
+                    </div>
+
+                    <div class="game-teams">
+                        <a href="@Url.Action("TeamDetails", "Team", new { abbrev = game.AwayTeam.Abbreviation })" class="team-display">
+                            <img src="@(string.IsNullOrEmpty(game.AwayTeam.Logo) ? $"https://a.espncdn.com/i/teamlogos/nba/500/{game.AwayTeam.Abbreviation.ToLower()}.png" : game.AwayTeam.Logo)"
+                                 class="team-logo-small"
+                                 alt="@game.AwayTeam.Abbreviation"
+                                 onerror="this.onerror=null; this.src='https://a.espncdn.com/i/teamlogos/nba/500/default.png';">
+                            <div class="team-info">
+                                <div class="team-city">@game.AwayTeam.Location</div>
+                                <div class="team-name-small">
+                                    @game.AwayTeam.ShortDisplayName
+                                </div>
+                            </div>
+                        </a>
+
+                        <a href="@Url.Action("Match", "Match", new { id = game.Id })" class="game-score-link">
+                            <div class="game-score">
+                                <span>VS</span>
+                            </div>
+                        </a>
+
+                        <a href="@Url.Action("TeamDetails", "Team", new { abbrev = game.HomeTeam.Abbreviation })" class="team-display away">
+                            <div class="team-info">
+                                <div class="team-city">@game.HomeTeam.Location</div>
+                                <div class="team-name-small">
+                                    @game.HomeTeam.ShortDisplayName
+                                </div>
+                            </div>
+                            <img src="@(string.IsNullOrEmpty(game.HomeTeam.Logo) ? $"https://a.espncdn.com/i/teamlogos/nba/500/{game.HomeTeam.Abbreviation.ToLower()}.png" : game.HomeTeam.Logo)"
+                                 class="team-logo-small"
+                                 alt="@game.HomeTeam.Abbreviation"
+                                 onerror="this.onerror=null; this.src='https://a.espncdn.com/i/teamlogos/nba/500/default.png';">
+                        </a>
+                    </div>
+
+                    <div class="game-status">
+                        <div class="status-badge-scheduled">Ожидается</div>
+                        <div class="venue-info">
+                            @game.Venue
+                            @if (!string.IsNullOrEmpty(game.Venue))
+                            {
+                                <div class="home-arena">
+                                    🏠 @game.HomeTeam.ShortDisplayName
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="no-games">
+            <i class="fas fa-calendar-times"></i>
+            <p>Расписание временно недоступно</p>
+        </div>
+    }
+
+    <div style="text-align: center; margin-top: 30px;">
+        <a href="javascript:history.back()" class="back-button">
+            <i class="fas fa-arrow-left"></i> Назад
+        </a>
+    </div>
+</div>
+
+<script>
+    function filterGames(type) {
+        const playedBtn = document.querySelectorAll('.filter-btn')[0];
+        const upcomingBtn = document.querySelectorAll('.filter-btn')[1];
+        const playedGrid = document.getElementById('played-games');
+        const upcomingGrid = document.getElementById('upcoming-games');
+
+        if (type === 'played') {
+            playedBtn.classList.add('active');
+            upcomingBtn.classList.remove('active');
+            playedGrid.style.display = 'grid';
+            upcomingGrid.style.display = 'none';
+        } else {
+            upcomingBtn.classList.add('active');
+            playedBtn.classList.remove('active');
+            upcomingGrid.style.display = 'grid';
+            playedGrid.style.display = 'none';
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        filterGames('played');
+
+        const cards = document.querySelectorAll('.game-card');
+        cards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+                card.style.transition = 'all 0.5s ease';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, index * 50);
+        });
+    });
+</script>

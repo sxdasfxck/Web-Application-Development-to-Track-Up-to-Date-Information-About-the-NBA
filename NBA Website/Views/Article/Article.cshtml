@@ -1,0 +1,294 @@
+﻿@model NBA_Website.Models.ArticleViewModel
+
+@{
+    ViewData["Title"] = Model.Headline;
+}
+
+<style>
+    .article-wrapper {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 40px 20px;
+    }
+
+    .article-header {
+        max-width: 800px;
+        margin: 0 auto 40px;
+    }
+
+    .article-title {
+        font-family: 'Georgia', 'Times New Roman', serif;
+        font-size: 2.8em;
+        font-weight: 700;
+        line-height: 1.2;
+        color: #111;
+        margin-bottom: 20px;
+        letter-spacing: -0.02em;
+    }
+
+    .article-description {
+        font-size: 1.3em;
+        color: #444;
+        line-height: 1.5;
+        margin-bottom: 25px;
+        font-weight: 400;
+        border-left: none;
+        padding-left: 0;
+    }
+
+    .article-meta {
+        display: flex;
+        gap: 25px;
+        color: #666;
+        font-size: 0.9em;
+        padding-bottom: 25px;
+        border-bottom: 1px solid #e5e5e5;
+        margin-bottom: 30px;
+        font-family: 'Helvetica', Arial, sans-serif;
+    }
+
+    .meta-item {
+        display: flex;
+        align-items: center;
+    }
+
+        .meta-item i {
+            color: #ff6b35;
+            margin-right: 8px;
+            font-size: 1.1em;
+        }
+
+    .article-content {
+        max-width: 700px;
+        margin: 0 auto;
+        font-family: 'Georgia', 'Times New Roman', serif;
+        font-size: 1.2em;
+        line-height: 1.8;
+        color: #222;
+    }
+
+    .article-paragraph {
+        margin-bottom: 1.8em;
+        font-size: 1.1em;
+        line-height: 1.7;
+        color: #333;
+    }
+
+    .article-teams {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin: 40px auto;
+        padding: 30px 0;
+        border-top: 1px solid #e5e5e5;
+        border-bottom: 1px solid #e5e5e5;
+        max-width: 700px;
+        justify-content: center;
+    }
+
+    .team-badge {
+        background: #f0f0f0;
+        color: #666;
+        padding: 8px 20px;
+        border-radius: 25px;
+        font-size: 1em;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        display: inline-block;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+        .team-badge:hover {
+            background: #ff6b35;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+            text-decoration: none;
+        }
+
+    .article-footer {
+        max-width: 700px;
+        margin: 50px auto 0;
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        flex-wrap: wrap;
+        padding-top: 20px;
+    }
+
+    .back-button {
+        display: inline-block;
+        background: #ff6b35;
+        color: white;
+        padding: 12px 32px;
+        border-radius: 30px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 1em;
+        font-family: 'Helvetica', Arial, sans-serif;
+        transition: all 0.2s;
+        border: none;
+        cursor: pointer;
+    }
+
+        .back-button:hover {
+            background: #ff5420;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+        }
+
+    .original-link {
+        display: inline-block;
+        background: #1d428a;
+        color: white;
+        padding: 12px 32px;
+        border-radius: 30px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 1em;
+        font-family: 'Helvetica', Arial, sans-serif;
+        transition: all 0.2s;
+    }
+
+        .original-link:hover {
+            background: #2d5ab9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(29, 66, 138, 0.3);
+        }
+
+    @@media (max-width: 768px) {
+        .article-title {
+            font-size: 2.2em;
+        }
+
+        .article-description {
+            font-size: 1.2em;
+        }
+
+        .article-content {
+            font-size: 1.1em;
+        }
+
+        .article-paragraph {
+            margin-bottom: 1.5em;
+        }
+
+        .article-wrapper {
+            padding: 20px 15px;
+        }
+    }
+</style>
+
+<div class="article-wrapper">
+    <div class="article-header">
+        <h1 class="article-title">@Model.Headline</h1>
+
+        @if (!string.IsNullOrEmpty(Model.Description))
+        {
+            <div class="article-description">@Model.Description</div>
+        }
+
+        <div class="article-meta">
+            <span class="meta-item">
+                <i class="far fa-calendar-alt"></i>
+                @Model.Published.ToString("MMMM d, yyyy")
+            </span>
+            <span class="meta-item">
+                <i class="far fa-clock"></i>
+                @Model.Published.ToString("h:mm tt")
+            </span>
+            <span class="meta-item">
+                <i class="fas fa-newspaper"></i>
+                @Model.Source
+            </span>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.Content))
+    {
+        <div class="article-content">
+            @{
+                var paragraphs = Model.Content.Split(new[] { "\n\n" }, StringSplitOptions.RemoveEmptyEntries);
+            }
+            @foreach (var paragraph in paragraphs)
+            {
+                <p class="article-paragraph">@paragraph</p>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="article-content">
+            <p class="article-paragraph">Полный текст статьи доступен на оригинальном сайте ESPN.</p>
+        </div>
+    }
+
+    @if (Model.Teams.Any())
+    {
+        <div class="article-teams">
+            @foreach (var team in Model.Teams)
+            {
+                var teamAbbrev = GetTeamAbbreviation(team);
+                <a href="@Url.Action("TeamDetails", "Team", new { abbrev = teamAbbrev })" class="team-badge">
+                    @team
+                </a>
+            }
+        </div>
+    }
+
+    <div class="article-footer">
+        <a href="javascript:history.back()" class="back-button">
+            <i class="fas fa-arrow-left"></i> Назад
+        </a>
+        @if (!string.IsNullOrEmpty(Model.ArticleUrl))
+        {
+            <a href="@Model.ArticleUrl" target="_blank" class="original-link">
+                <i class="fas fa-external-link-alt"></i> Читать на ESPN
+            </a>
+        }
+    </div>
+</div>
+
+@functions {
+    public string GetTeamAbbreviation(string teamName)
+    {
+        var teamAbbreviations = new Dictionary<string, string>
+        {
+            { "Atlanta Hawks", "ATL" },
+            { "Boston Celtics", "BOS" },
+            { "Brooklyn Nets", "BKN" },
+            { "Charlotte Hornets", "CHA" },
+            { "Chicago Bulls", "CHI" },
+            { "Cleveland Cavaliers", "CLE" },
+            { "Dallas Mavericks", "DAL" },
+            { "Denver Nuggets", "DEN" },
+            { "Detroit Pistons", "DET" },
+            { "Golden State Warriors", "GS" },
+            { "Houston Rockets", "HOU" },
+            { "Indiana Pacers", "IND" },
+            { "LA Clippers", "LAC" },
+            { "Los Angeles Lakers", "LAL" },
+            { "Memphis Grizzlies", "MEM" },
+            { "Miami Heat", "MIA" },
+            { "Milwaukee Bucks", "MIL" },
+            { "Minnesota Timberwolves", "MIN" },
+            { "New Orleans Pelicans", "NO" },
+            { "New York Knicks", "NY" },
+            { "Oklahoma City Thunder", "OKC" },
+            { "Orlando Magic", "ORL" },
+            { "Philadelphia 76ers", "PHI" },
+            { "Phoenix Suns", "PHX" },
+            { "Portland Trail Blazers", "POR" },
+            { "Sacramento Kings", "SAC" },
+            { "San Antonio Spurs", "SA" },
+            { "Toronto Raptors", "TOR" },
+            { "Utah Jazz", "UTAH" },
+            { "Washington Wizards", "WSH" }
+        };
+
+        return teamAbbreviations.ContainsKey(teamName) ? teamAbbreviations[teamName] : "";
+    }
+}

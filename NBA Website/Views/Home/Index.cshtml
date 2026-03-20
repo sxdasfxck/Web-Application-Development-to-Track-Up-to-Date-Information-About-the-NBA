@@ -1,0 +1,348 @@
+﻿@model List<NBA_Website.Models.NewsViewModel>
+
+@{
+    ViewData["Title"] = "Главная";
+
+    var newsByDate = Model
+        .GroupBy(n => n.Published.Date)
+        .OrderByDescending(g => g.Key)
+        .ToDictionary(g => g.Key, g => g.ToList());
+}
+
+<style>
+    .hero-section {
+        text-align: center;
+        padding: 40px 0 20px;
+    }
+
+    .hero-title {
+        font-size: 3.5em;
+        font-weight: 800;
+        color: #1a1a1a;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        margin-bottom: 20px;
+    }
+
+        .hero-title i {
+            color: #ff6b35;
+            margin-right: 15px;
+        }
+
+    .date-header {
+        margin: 40px 0 20px;
+        padding-bottom: 10px;
+        border-bottom: 3px solid #ff6b35;
+        font-size: 2em;
+        font-weight: 700;
+        color: #1a1a1a;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+    }
+
+        .date-header i {
+            color: #ff6b35;
+            margin-right: 15px;
+        }
+
+    .news-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 25px;
+        padding: 20px 0;
+    }
+
+    .news-card {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+        border: 1px solid #e0e0e0;
+        display: flex;
+        flex-direction: column;
+    }
+
+        .news-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+        }
+
+    .news-color-strip {
+        height: 8px;
+        width: 100%;
+        background: linear-gradient(90deg, #ff6b35, #ff8c5a);
+    }
+
+    .news-image-container {
+        width: 100%;
+        height: 200px;
+        overflow: hidden;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    }
+
+    .news-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+
+    .news-card:hover .news-image {
+        transform: scale(1.05);
+    }
+
+    .news-content {
+        padding: 20px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .news-date {
+        font-size: 0.85em;
+        color: #999;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 10px;
+    }
+
+    .news-headline {
+        font-size: 1.3em;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 10px;
+        line-height: 1.4;
+    }
+
+    .news-description {
+        color: #666;
+        font-size: 0.95em;
+        line-height: 1.5;
+        margin-bottom: 15px;
+        flex: 1;
+    }
+
+    .news-teams {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 15px;
+    }
+
+    .team-tag {
+        background: #f0f0f0;
+        color: #666;
+        padding: 4px 12px;
+        border-radius: 15px;
+        font-size: 0.85em;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+        .team-tag:hover {
+            background: #ff6b35;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(255, 107, 53, 0.3);
+            text-decoration: none;
+        }
+
+    .news-button {
+        display: inline-block;
+        background: #ff6b35;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 25px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        font-size: 0.85em;
+        letter-spacing: 1px;
+        text-decoration: none;
+        text-align: center;
+        margin-top: auto;
+    }
+
+        .news-button:hover {
+            background: #ff5420;
+            transform: scale(1.05);
+            color: white;
+            text-decoration: none;
+        }
+
+    .no-image {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        font-size: 3em;
+    }
+
+    .loading-spinner {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 400px;
+    }
+
+    .spinner {
+        border: 5px solid #f3f3f3;
+        border-top: 5px solid #ff6b35;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        animation: spin 1s linear infinite;
+    }
+
+    @@keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+</style>
+
+<div class="hero-section">
+    <h1 class="hero-title">
+        <i class="fas fa-basketball-ball"></i>
+        NBA Info
+    </h1>
+</div>
+
+@if (Model != null && Model.Any())
+{
+    foreach (var dateGroup in newsByDate)
+    {
+        <div class="date-header">
+            <i class="fas fa-calendar-alt"></i>
+            @dateGroup.Key.ToString("dd MMMM yyyy")
+        </div>
+
+        <div class="news-grid">
+            @foreach (var news in dateGroup.Value)
+            {
+                <div class="news-card">
+                    <div class="news-color-strip"></div>
+
+                    <div class="news-image-container">
+                        @if (!string.IsNullOrEmpty(news.ImageUrl))
+                        {
+                            <img src="@news.ImageUrl" class="news-image" alt="@news.Headline"
+                                 onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'no-image\'><i class=\'fas fa-newspaper\'></i></div>';">
+                        }
+                        else
+                        {
+                            <div class="no-image">
+                                <i class="fas fa-newspaper"></i>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="news-content">
+                        <div class="news-date">
+                            <i class="far fa-clock" style="margin-right: 5px;"></i>
+                            @news.Published.ToString("dd MMMM yyyy, HH:mm")
+                        </div>
+
+                        <h2 class="news-headline">@news.Headline</h2>
+                        <p class="news-description">@news.Description</p>
+
+                        @if (news.Teams.Any())
+                        {
+                            <div class="news-teams">
+                                @foreach (var team in news.Teams.Take(3))
+                                {
+                                    var teamAbbrev = GetTeamAbbreviation(team);
+                                    <a href="@Url.Action("TeamDetails", "Team", new { abbrev = teamAbbrev })" class="team-tag">
+                                        @team
+                                    </a>
+                                }
+                            </div>
+                        }
+
+                        <a href="@Url.Action("Article", "Article", new { id = news.Id })" class="news-button">
+                            <i class="fas fa-book-open"></i> Читать полностью
+                        </a>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+}
+else
+{
+    <div class="loading-spinner">
+        <div class="spinner"></div>
+    </div>
+    <p style="text-align: center; margin-top: 20px;">Загрузка новостей...</p>
+}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const cards = document.querySelectorAll('.news-card');
+        cards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+                card.style.transition = 'all 0.5s ease';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, index * 100);
+        });
+    });
+</script>
+
+@functions {
+    public string GetTeamAbbreviation(string teamName)
+    {
+        var teamAbbreviations = new Dictionary<string, string>
+        {
+            { "Atlanta Hawks", "ATL" },
+            { "Boston Celtics", "BOS" },
+            { "Brooklyn Nets", "BKN" },
+            { "Charlotte Hornets", "CHA" },
+            { "Chicago Bulls", "CHI" },
+            { "Cleveland Cavaliers", "CLE" },
+            { "Dallas Mavericks", "DAL" },
+            { "Denver Nuggets", "DEN" },
+            { "Detroit Pistons", "DET" },
+            { "Golden State Warriors", "GS" },
+            { "Houston Rockets", "HOU" },
+            { "Indiana Pacers", "IND" },
+            { "LA Clippers", "LAC" },
+            { "Los Angeles Lakers", "LAL" },
+            { "Memphis Grizzlies", "MEM" },
+            { "Miami Heat", "MIA" },
+            { "Milwaukee Bucks", "MIL" },
+            { "Minnesota Timberwolves", "MIN" },
+            { "New Orleans Pelicans", "NO" },
+            { "New York Knicks", "NY" },
+            { "Oklahoma City Thunder", "OKC" },
+            { "Orlando Magic", "ORL" },
+            { "Philadelphia 76ers", "PHI" },
+            { "Phoenix Suns", "PHX" },
+            { "Portland Trail Blazers", "POR" },
+            { "Sacramento Kings", "SAC" },
+            { "San Antonio Spurs", "SA" },
+            { "Toronto Raptors", "TOR" },
+            { "Utah Jazz", "UTAH" },
+            { "Washington Wizards", "WSH" }
+        };
+
+        return teamAbbreviations.ContainsKey(teamName) ? teamAbbreviations[teamName] : "";
+    }
+}

@@ -1,0 +1,506 @@
+﻿@model NBA_Website.Models.LeadersViewModel
+
+@{
+    ViewData["Title"] = "Лидеры сезона NBA";
+}
+
+<style>
+    .leaders-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 30px 20px;
+    }
+
+    .page-header {
+        background: linear-gradient(135deg, #1a1a1a 0%, #2c2c2c 100%);
+        border-radius: 20px;
+        padding: 40px;
+        margin-bottom: 30px;
+        color: white;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 8px;
+            background: linear-gradient(90deg, #ff6b35 0%, #ff8c5a 100%);
+        }
+
+    .page-title {
+        font-size: 2.5em;
+        font-weight: 800;
+        margin-bottom: 10px;
+        letter-spacing: -0.02em;
+    }
+
+    .leaders-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        gap: 25px;
+        margin-top: 30px;
+    }
+
+    .leader-card {
+        background: white;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        border: 1px solid #e0e0e0;
+        transition: transform 0.3s ease;
+        display: flex;
+        flex-direction: column;
+    }
+
+        .leader-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+        }
+
+    .card-header {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        padding: 20px;
+        border-bottom: 2px solid #ff6b35;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+        .card-header i {
+            color: #ff6b35;
+            font-size: 1.5em;
+        }
+
+        .card-header h3 {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #333;
+            margin: 0;
+        }
+
+    .players-list {
+        padding: 15px;
+        flex: 1;
+    }
+
+    .player-row {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 12px;
+        border-bottom: 1px solid #f0f0f0;
+        transition: background 0.2s ease;
+    }
+
+        .player-row:last-child {
+            border-bottom: none;
+        }
+
+        .player-row:hover {
+            background: #fff5f0;
+        }
+
+    .player-rank {
+        width: 40px;
+        height: 40px;
+        background: #f0f0f0;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        color: #666;
+    }
+
+        .player-rank.top-1 {
+            background: #ffd700;
+            color: #1a1a1a;
+        }
+
+        .player-rank.top-2 {
+            background: #c0c0c0;
+            color: #1a1a1a;
+        }
+
+        .player-rank.top-3 {
+            background: #cd7f32;
+            color: white;
+        }
+
+    .player-image-small {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+        cursor: pointer;
+        transition: transform 0.2s ease;
+    }
+
+        .player-image-small:hover {
+            transform: scale(1.1);
+        }
+
+    .player-info {
+        flex: 1;
+    }
+
+    .player-name-link {
+        font-weight: 600;
+        color: #333;
+        text-decoration: none;
+        transition: color 0.2s ease;
+        display: inline-block;
+    }
+
+        .player-name-link:hover {
+            color: #ff6b35;
+            text-decoration: underline;
+        }
+
+    .player-team-link {
+        font-size: 0.85em;
+        color: #999;
+        text-decoration: none;
+        transition: color 0.2s ease;
+        display: inline-block;
+    }
+
+        .player-team-link:hover {
+            color: #ff6b35;
+            text-decoration: underline;
+        }
+
+    .player-value {
+        font-size: 1.3em;
+        font-weight: 700;
+        color: #ff6b35;
+        min-width: 50px;
+        text-align: right;
+    }
+
+    .card-footer {
+        padding: 15px 20px;
+        background: #f8f9fa;
+        border-top: 1px solid #e0e0e0;
+        text-align: center;
+    }
+
+    .view-all-btn {
+        display: inline-block;
+        background: #ff6b35;
+        color: white;
+        padding: 10px 25px;
+        border-radius: 30px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.9em;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+    }
+
+        .view-all-btn:hover {
+            background: #ff5420;
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(255,107,53,0.3);
+        }
+
+        .view-all-btn i {
+            margin-left: 8px;
+        }
+
+    .back-button {
+        display: inline-block;
+        background: #ff6b35;
+        color: white;
+        padding: 12px 30px;
+        border-radius: 30px;
+        text-decoration: none;
+        font-weight: 600;
+        margin-top: 40px;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+    }
+
+        .back-button:hover {
+            background: white;
+            color: #ff6b35;
+            border-color: #ff6b35;
+            transform: translateX(-5px);
+        }
+
+        .back-button i {
+            margin-right: 8px;
+        }
+
+    .text-center {
+        text-align: center;
+    }
+
+    @@media (max-width: 768px) {
+        .page-title {
+            font-size: 2em;
+        }
+
+        .leaders-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .player-row {
+            flex-wrap: wrap;
+        }
+    }
+</style>
+
+<div class="leaders-container">
+    <div class="page-header">
+        <h1 class="page-title">
+            <i class="fas fa-chart-line" style="margin-right: 15px; color: #ff6b35;"></i>
+            Лидеры сезона (средние показатели за игру)
+        </h1>
+    </div>
+
+    <div class="leaders-grid">
+        <div class="leader-card">
+            <div class="card-header">
+                <i class="fas fa-basketball-ball"></i>
+                <h3>Очки (PPG)</h3>
+            </div>
+            <div class="players-list">
+                @foreach (var player in Model.PointsLeaders)
+                {
+                    <div class="player-row">
+                        <div class="player-rank @(player.Rank == "1" ? "top-1" : player.Rank == "2" ? "top-2" : player.Rank == "3" ? "top-3" : "")">
+                            @player.Rank
+                        </div>
+                        <a href="@Url.Action("PlayersPage", "PlayersPage", new { playerId = player.PlayerId })">
+                            <img src="@player.HeadshotUrl" class="player-image-small" alt="@player.PlayerName"
+                                 onerror="this.onerror=null; this.src='https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/0.png&w=200&h=200';">
+                        </a>
+                        <div class="player-info">
+                            <a href="@Url.Action("PlayersPage", "PlayersPage", new { playerId = player.PlayerId })" class="player-name-link">
+                                @player.PlayerName
+                            </a>
+                            <br />
+                            <a href="@Url.Action("TeamDetails", "Team", new { abbrev = player.TeamAbbrev })" class="player-team-link">
+                                @player.TeamAbbrev
+                            </a>
+                        </div>
+                        <div class="player-value">@player.Value</div>
+                    </div>
+                }
+            </div>
+            <div class="card-footer">
+                <a href="@Url.Action("FullStats", "FullStats", new { type = "main", sortBy = "PTS", page = 1 })" class="view-all-btn">
+                    Все лидеры по очкам <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+
+        <div class="leader-card">
+            <div class="card-header">
+                <i class="fas fa-hand-paper"></i>
+                <h3>Передачи (APG)</h3>
+            </div>
+            <div class="players-list">
+                @foreach (var player in Model.AssistsLeaders)
+                {
+                    <div class="player-row">
+                        <div class="player-rank @(player.Rank == "1" ? "top-1" : player.Rank == "2" ? "top-2" : player.Rank == "3" ? "top-3" : "")">
+                            @player.Rank
+                        </div>
+                        <a href="@Url.Action("PlayersPage", "PlayersPage", new { playerId = player.PlayerId })">
+                            <img src="@player.HeadshotUrl" class="player-image-small" alt="@player.PlayerName"
+                                 onerror="this.onerror=null; this.src='https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/0.png&w=200&h=200';">
+                        </a>
+                        <div class="player-info">
+                            <a href="@Url.Action("PlayersPage", "PlayersPage", new { playerId = player.PlayerId })" class="player-name-link">
+                                @player.PlayerName
+                            </a>
+                            <br />
+                            <a href="@Url.Action("TeamDetails", "Team", new { abbrev = player.TeamAbbrev })" class="player-team-link">
+                                @player.TeamAbbrev
+                            </a>
+                        </div>
+                        <div class="player-value">@player.Value</div>
+                    </div>
+                }
+            </div>
+            <div class="card-footer">
+                <a href="@Url.Action("FullStats", "FullStats", new { type = "main", sortBy = "AST", page = 1 })" class="view-all-btn">
+                    Все лидеры по передачам <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+
+        <div class="leader-card">
+            <div class="card-header">
+                <i class="fas fa-arrow-up"></i>
+                <h3>Подборы (RPG)</h3>
+            </div>
+            <div class="players-list">
+                @foreach (var player in Model.ReboundsLeaders)
+                {
+                    <div class="player-row">
+                        <div class="player-rank @(player.Rank == "1" ? "top-1" : player.Rank == "2" ? "top-2" : player.Rank == "3" ? "top-3" : "")">
+                            @player.Rank
+                        </div>
+                        <a href="@Url.Action("PlayersPage", "PlayersPage", new { playerId = player.PlayerId })">
+                            <img src="@player.HeadshotUrl" class="player-image-small" alt="@player.PlayerName"
+                                 onerror="this.onerror=null; this.src='https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/0.png&w=200&h=200';">
+                        </a>
+                        <div class="player-info">
+                            <a href="@Url.Action("PlayersPage", "PlayersPage", new { playerId = player.PlayerId })" class="player-name-link">
+                                @player.PlayerName
+                            </a>
+                            <br />
+                            <a href="@Url.Action("TeamDetails", "Team", new { abbrev = player.TeamAbbrev })" class="player-team-link">
+                                @player.TeamAbbrev
+                            </a>
+                        </div>
+                        <div class="player-value">@player.Value</div>
+                    </div>
+                }
+            </div>
+            <div class="card-footer">
+                <a href="@Url.Action("FullStats", "FullStats", new { type = "main", sortBy = "REB", page = 1 })" class="view-all-btn">
+                    Все лидеры по подборам <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+
+        <div class="leader-card">
+            <div class="card-header">
+                <i class="fas fa-shield-alt"></i>
+                <h3>Блок-шоты (BPG)</h3>
+            </div>
+            <div class="players-list">
+                @foreach (var player in Model.BlocksLeaders)
+                {
+                    <div class="player-row">
+                        <div class="player-rank @(player.Rank == "1" ? "top-1" : player.Rank == "2" ? "top-2" : player.Rank == "3" ? "top-3" : "")">
+                            @player.Rank
+                        </div>
+                        <a href="@Url.Action("PlayersPage", "PlayersPage", new { playerId = player.PlayerId })">
+                            <img src="@player.HeadshotUrl" class="player-image-small" alt="@player.PlayerName"
+                                 onerror="this.onerror=null; this.src='https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/0.png&w=200&h=200';">
+                        </a>
+                        <div class="player-info">
+                            <a href="@Url.Action("PlayersPage", "PlayersPage", new { playerId = player.PlayerId })" class="player-name-link">
+                                @player.PlayerName
+                            </a>
+                            <br />
+                            <a href="@Url.Action("TeamDetails", "Team", new { abbrev = player.TeamAbbrev })" class="player-team-link">
+                                @player.TeamAbbrev
+                            </a>
+                        </div>
+                        <div class="player-value">@player.Value</div>
+                    </div>
+                }
+            </div>
+            <div class="card-footer">
+                <a href="@Url.Action("FullStats", "FullStats", new { type = "main", sortBy = "BLK", page = 1 })" class="view-all-btn">
+                    Все лидеры по блок-шотам <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+
+        <div class="leader-card">
+            <div class="card-header">
+                <i class="fas fa-hand-rock"></i>
+                <h3>Перехваты (SPG)</h3>
+            </div>
+            <div class="players-list">
+                @foreach (var player in Model.StealsLeaders)
+                {
+                    <div class="player-row">
+                        <div class="player-rank @(player.Rank == "1" ? "top-1" : player.Rank == "2" ? "top-2" : player.Rank == "3" ? "top-3" : "")">
+                            @player.Rank
+                        </div>
+                        <a href="@Url.Action("PlayersPage", "PlayersPage", new { playerId = player.PlayerId })">
+                            <img src="@player.HeadshotUrl" class="player-image-small" alt="@player.PlayerName"
+                                 onerror="this.onerror=null; this.src='https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/0.png&w=200&h=200';">
+                        </a>
+                        <div class="player-info">
+                            <a href="@Url.Action("PlayersPage", "PlayersPage", new { playerId = player.PlayerId })" class="player-name-link">
+                                @player.PlayerName
+                            </a>
+                            <br />
+                            <a href="@Url.Action("TeamDetails", "Team", new { abbrev = player.TeamAbbrev })" class="player-team-link">
+                                @player.TeamAbbrev
+                            </a>
+                        </div>
+                        <div class="player-value">@player.Value</div>
+                    </div>
+                }
+            </div>
+            <div class="card-footer">
+                <a href="@Url.Action("FullStats", "FullStats", new { type = "main", sortBy = "STL", page = 1 })" class="view-all-btn">
+                    Все лидеры по перехватам <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+
+        <div class="leader-card">
+            <div class="card-header">
+                <i class="fas fa-bullseye"></i>
+                <h3>Трехочковые (3PM)</h3>
+            </div>
+            <div class="players-list">
+                @foreach (var player in Model.ThreePointLeaders)
+                {
+                    <div class="player-row">
+                        <div class="player-rank @(player.Rank == "1" ? "top-1" : player.Rank == "2" ? "top-2" : player.Rank == "3" ? "top-3" : "")">
+                            @player.Rank
+                        </div>
+                        <a href="@Url.Action("PlayersPage", "PlayersPage", new { playerId = player.PlayerId })">
+                            <img src="@player.HeadshotUrl" class="player-image-small" alt="@player.PlayerName"
+                                 onerror="this.onerror=null; this.src='https://a.espncdn.com/combiner/i?img=/i/headshots/nba/players/full/0.png&w=200&h=200';">
+                        </a>
+                        <div class="player-info">
+                            <a href="@Url.Action("PlayersPage", "PlayersPage", new { playerId = player.PlayerId })" class="player-name-link">
+                                @player.PlayerName
+                            </a>
+                            <br />
+                            <a href="@Url.Action("TeamDetails", "Team", new { abbrev = player.TeamAbbrev })" class="player-team-link">
+                                @player.TeamAbbrev
+                            </a>
+                        </div>
+                        <div class="player-value">@player.Value</div>
+                    </div>
+                }
+            </div>
+            <div class="card-footer">
+                <a href="@Url.Action("FullStats", "FullStats", new { type = "shooting", sortBy = "3PM", page = 1 })" class="view-all-btn">
+                    Все лидеры по трехочковым <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center">
+        <a href="javascript:history.back()" class="back-button">
+            <i class="fas fa-arrow-left"></i> Назад
+        </a>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const cards = document.querySelectorAll('.leader-card');
+        cards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+                card.style.transition = 'all 0.5s ease';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, index * 100);
+        });
+    });
+</script>
